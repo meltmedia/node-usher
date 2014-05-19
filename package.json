@@ -1,0 +1,48 @@
+{
+  "name" : "usher",
+  "version" : "0.1.0",
+  "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
+  "author" : "Mike Moulton <mike@meltmedia.com>",
+  "main" : "index.js",
+  "scripts": {
+    "test": "./node-modules/.bin/gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mmoulton/workflow.git"
+  },
+  "keywords": [
+    "usher",
+    "Amazon Web Services",
+    "AWS",
+    "SWF",
+    "Simple Workflow",
+    "Decider"
+  ],
+  "dependencies" : {
+    "winston": "*",
+    "aws-swf": "*",
+    "aws-sdk": "*",
+    "lodash": "*",
+    "orchestrator": "*",
+    "sequencify": "git://github.com/robrich/sequencify.git"
+  },
+  "devDependencies": {
+    "q": "*",
+    "gulp": "*",
+    "gulp-jshint": "*",
+    "gulp-jsdoc": "*",
+    "gulp-mocha": "*",
+    "jshint-stylish": "*",
+    "chai": "*"
+  },
+  "engines" : {
+    "node" : ">= 0.10.0"
+  },
+  "author" : "Mike Moulton <mike@meltmedia.com>",
+  "contributors" : [{
+    "name" : "Mike Moulton",
+    "email" : "mike@meltmedia.com"
+  }],
+  "license": "MIT"
+}

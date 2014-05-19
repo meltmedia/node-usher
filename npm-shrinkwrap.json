@@ -1,0 +1,190 @@
+{
+  "name": "usher",
+  "version": "0.1.0",
+  "dependencies": {
+    "aws-sdk": {
+      "version": "2.0.0-rc.17",
+      "from": "aws-sdk@*",
+      "resolved": "https://registry.npmjs.org/aws-sdk/-/aws-sdk-2.0.0-rc.17.tgz",
+      "dependencies": {
+        "aws-sdk-apis": {
+          "version": "2.0.10",
+          "from": "aws-sdk-apis@2.x",
+          "resolved": "https://registry.npmjs.org/aws-sdk-apis/-/aws-sdk-apis-2.0.10.tgz"
+        },
+        "xml2js": {
+          "version": "0.2.4",
+          "from": "xml2js@0.2.4",
+          "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.2.4.tgz",
+          "dependencies": {
+            "sax": {
+              "version": "0.6.0",
+              "from": "sax@>=0.4.2"
+            }
+          }
+        },
+        "xmlbuilder": {
+          "version": "0.4.2",
+          "from": "xmlbuilder@0.4.2"
+        }
+      }
+    },
+    "aws-swf": {
+      "version": "4.0.0",
+      "from": "aws-swf@*",
+      "dependencies": {
+        "aws-sdk": {
+          "version": "2.0.0-rc9",
+          "from": "aws-sdk@2.0.0-rc9",
+          "dependencies": {
+            "xml2js": {
+              "version": "0.2.4",
+              "from": "xml2js@0.2.4",
+              "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.2.4.tgz",
+              "dependencies": {
+                "sax": {
+                  "version": "0.6.0",
+                  "from": "sax@>=0.4.2"
+                }
+              }
+            },
+            "xmlbuilder": {
+              "version": "0.4.2",
+              "from": "xmlbuilder@0.4.2"
+            }
+          }
+        }
+      }
+    },
+    "lodash": {
+      "version": "2.4.1",
+      "from": "lodash@*"
+    },
+    "orchestrator": {
+      "version": "0.3.3",
+      "from": "orchestrator@*",
+      "dependencies": {
+        "sequencify": {
+          "version": "0.0.7",
+          "from": "sequencify@~0.0.7"
+        }
+      }
+    },
+    "sequencify": {
+      "version": "1.0.0",
+      "from": "sequencify@git://github.com/robrich/sequencify.git",
+      "resolved": "git://github.com/robrich/sequencify.git#1c66e1cda4b08f78814752eeca9296fed0435212"
+    },
+    "winston": {
+      "version": "0.7.3",
+      "from": "winston@*",
+      "dependencies": {
+        "async": {
+          "version": "0.2.10",
+          "from": "async@0.2.x"
+        },
+        "colors": {
+          "version": "0.6.2",
+          "from": "colors@0.6.x"
+        },
+        "cycle": {
+          "version": "1.0.3",
+          "from": "cycle@1.0.x"
+        },
+        "eyes": {
+          "version": "0.1.8",
+          "from": "eyes@0.1.x"
+        },
+        "pkginfo": {
+          "version": "0.3.0",
+          "from": "pkginfo@0.3.x"
+        },
+        "request": {
+          "version": "2.16.6",
+          "from": "request@2.16.x",
+          "dependencies": {
+            "form-data": {
+              "version": "0.0.10",
+              "from": "form-data@~0.0.3",
+              "dependencies": {
+                "combined-stream": {
+                  "version": "0.0.4",
+                  "from": "combined-stream@~0.0.4",
+                  "dependencies": {
+                    "delayed-stream": {
+                      "version": "0.0.5",
+                      "from": "delayed-stream@0.0.5",
+                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                    }
+                  }
+                }
+              }
+            },
+            "mime": {
+              "version": "1.2.11",
+              "from": "mime@~1.2.7"
+            },
+            "hawk": {
+              "version": "0.10.2",
+              "from": "hawk@~0.10.2",
+              "dependencies": {
+                "hoek": {
+                  "version": "0.7.6",
+                  "from": "hoek@0.7.x"
+                },
+                "boom": {
+                  "version": "0.3.8",
+                  "from": "boom@0.3.x"
+                },
+                "cryptiles": {
+                  "version": "0.1.3",
+                  "from": "cryptiles@0.1.x"
+                },
+                "sntp": {
+                  "version": "0.1.4",
+                  "from": "sntp@0.1.x"
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.4.1",
+              "from": "node-uuid@~1.4.0"
+            },
+            "cookie-jar": {
+              "version": "0.2.0",
+              "from": "cookie-jar@~0.2.0"
+            },
+            "aws-sign": {
+              "version": "0.2.0",
+              "from": "aws-sign@~0.2.0"
+            },
+            "oauth-sign": {
+              "version": "0.2.0",
+              "from": "oauth-sign@~0.2.0"
+            },
+            "forever-agent": {
+              "version": "0.2.0",
+              "from": "forever-agent@~0.2.0"
+            },
+            "tunnel-agent": {
+              "version": "0.2.0",
+              "from": "tunnel-agent@~0.2.0"
+            },
+            "json-stringify-safe": {
+              "version": "3.0.0",
+              "from": "json-stringify-safe@~3.0.0"
+            },
+            "qs": {
+              "version": "0.5.6",
+              "from": "qs@~0.5.4"
+            }
+          }
+        },
+        "stack-trace": {
+          "version": "0.0.9",
+          "from": "stack-trace@0.0.x"
+        }
+      }
+    }
+  }
+}
