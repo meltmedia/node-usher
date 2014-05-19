@@ -65,7 +65,7 @@ As far as SWF is concerned, a PollForDecisionTask only requires 2 primary inputs
 
 The following outlines the details of the decisions the workflow will schedule with SWF for each workflow execution. For more information on this format see the SWF API for [RespondDecisionTaskCompleted](http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RespondDecisionTaskCompleted.html)
 
-1. `activity1`
++ `activity1`
 ``` json
 "scheduleActivityTaskDecisionAttributes": {
   "activityId": "activity1",
@@ -84,7 +84,7 @@ The following outlines the details of the decisions the workflow will schedule w
 }
 ```
 
-2. `activity2`
++ `activity2`
 ``` json
 "scheduleActivityTaskDecisionAttributes": {
   "activityId": "activity2",
@@ -103,7 +103,7 @@ The following outlines the details of the decisions the workflow will schedule w
 }
 ```
 
-3. `activity3`
++ `activity3`
 ``` json
 "scheduleActivityTaskDecisionAttributes": {
   "activityId": "activity3",
@@ -122,7 +122,7 @@ The following outlines the details of the decisions the workflow will schedule w
 }
 ```
 
-4. `activity4`
++ `activity4`
 ``` json
 "scheduleActivityTaskDecisionAttributes": {
   "activityId": "activity4",
