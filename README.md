@@ -66,77 +66,80 @@ As far as SWF is concerned, a PollForDecisionTask only requires 2 primary inputs
 The following outlines the details of the decisions the workflow will schedule with SWF for each workflow execution. For more information on this format see the SWF API for [RespondDecisionTaskCompleted](http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RespondDecisionTaskCompleted.html)
 
 1. `activity1`
-    ``` json
-    "scheduleActivityTaskDecisionAttributes": {
-      "activityId": "activity1",
-      "activityType": {
-        "name": "activity1",
-        "version": "1.0"
-      },
-      "heartbeatTimeout": "60",
-      "input": "[ \"_input\": \"<workflow input>\" ]",
-      "scheduleToCloseTimeout": "360",
-      "scheduleToStartTimeout": "60",
-      "startToCloseTimeout": "300",
-      "taskList": {
-        "name": "activity1-tasklist"
-      }
-    }
-    ```
+``` json
+"scheduleActivityTaskDecisionAttributes": {
+  "activityId": "activity1",
+  "activityType": {
+    "name": "activity1",
+    "version": "1.0"
+  },
+  "heartbeatTimeout": "60",
+  "input": "[ \"_input\": \"<workflow input>\" ]",
+  "scheduleToCloseTimeout": "360",
+  "scheduleToStartTimeout": "60",
+  "startToCloseTimeout": "300",
+  "taskList": {
+    "name": "activity1-tasklist"
+  }
+}
+```
+
 2. `activity2`
-    ``` json
-    "scheduleActivityTaskDecisionAttributes": {
-      "activityId": "activity2",
-      "activityType": {
-        "name": "activity2",
-        "version": "1.0"
-      },
-      "heartbeatTimeout": "60",
-      "input": "[ \"_input\": \"<workflow input>\", \"activity1\": \"{ \"key1\": \"value 1\" }\" ]",
-      "scheduleToCloseTimeout": "360",
-      "scheduleToStartTimeout": "60",
-      "startToCloseTimeout": "300",
-      "taskList": {
-        "name": "activity2-tasklist"
-      }
-    }
-    ```
+``` json
+"scheduleActivityTaskDecisionAttributes": {
+  "activityId": "activity2",
+  "activityType": {
+    "name": "activity2",
+    "version": "1.0"
+  },
+  "heartbeatTimeout": "60",
+  "input": "[ \"_input\": \"<workflow input>\", \"activity1\": \"{ \"key1\": \"value 1\" }\" ]",
+  "scheduleToCloseTimeout": "360",
+  "scheduleToStartTimeout": "60",
+  "startToCloseTimeout": "300",
+  "taskList": {
+    "name": "activity2-tasklist"
+  }
+}
+```
+
 3. `activity3`
-    ``` json
-    "scheduleActivityTaskDecisionAttributes": {
-      "activityId": "activity3",
-      "activityType": {
-        "name": "activity3",
-        "version": "1.0"
-      },
-      "heartbeatTimeout": "60",
-      "input": "[ \"_input\": \"<workflow input>\", \"activity2\": \"{ \"key2\": \"value 2\" }\" ]",
-      "scheduleToCloseTimeout": "360",
-      "scheduleToStartTimeout": "60",
-      "startToCloseTimeout": "300",
-      "taskList": {
-        "name": "activity3-tasklist"
-      }
-    }
-    ```
+``` json
+"scheduleActivityTaskDecisionAttributes": {
+  "activityId": "activity3",
+  "activityType": {
+    "name": "activity3",
+    "version": "1.0"
+  },
+  "heartbeatTimeout": "60",
+  "input": "[ \"_input\": \"<workflow input>\", \"activity2\": \"{ \"key2\": \"value 2\" }\" ]",
+  "scheduleToCloseTimeout": "360",
+  "scheduleToStartTimeout": "60",
+  "startToCloseTimeout": "300",
+  "taskList": {
+    "name": "activity3-tasklist"
+  }
+}
+```
+
 4. `activity4`
-    ``` json
-    "scheduleActivityTaskDecisionAttributes": {
-      "activityId": "activity4",
-      "activityType": {
-        "name": "activity4",
-        "version": "1.0"
-      },
-      "heartbeatTimeout": "60",
-      "input": "[ \"_input\": \"<workflow input>\", \"activity3\": \"{ \"key3\": \"value 3\" }\" ]",
-      "scheduleToCloseTimeout": "360",
-      "scheduleToStartTimeout": "60",
-      "startToCloseTimeout": "300",
-      "taskList": {
-        "name": "activity4-tasklist"
-      }
-    }
-    ```
+``` json
+"scheduleActivityTaskDecisionAttributes": {
+  "activityId": "activity4",
+  "activityType": {
+    "name": "activity4",
+    "version": "1.0"
+  },
+  "heartbeatTimeout": "60",
+  "input": "[ \"_input\": \"<workflow input>\", \"activity3\": \"{ \"key3\": \"value 3\" }\" ]",
+  "scheduleToCloseTimeout": "360",
+  "scheduleToStartTimeout": "60",
+  "startToCloseTimeout": "300",
+  "taskList": {
+    "name": "activity4-tasklist"
+  }
+}
+```
 
 #### Results
 
