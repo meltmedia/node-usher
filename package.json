@@ -1,6 +1,6 @@
 {
   "name" : "usher",
-  "version" : "0.1.0",
+  "version" : "0.1.1",
   "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
   "author" : "Mike Moulton <mike@meltmedia.com>",
   "main" : "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mmoulton/workflow.git"
+    "url": "git://github.com/meltmedia/node-usher.git"
   },
   "keywords": [
     "usher",
