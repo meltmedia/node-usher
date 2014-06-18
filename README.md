@@ -5,6 +5,8 @@ This libraries goal is to enable simple, dependency based compositions of activi
 
 In the name of simplicity, this library has strong opinions on convention, with the ability to configure and override some of these conventions.
 
+Note: This library is used to implement [Deciders](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-deciders) for AWS [Simple Workflow Service](http://aws.amazon.com/swf/). If you do not know what these are, this library is not for you (yet).
+
 ## Conventions
 
 ### Tasks
@@ -175,7 +177,7 @@ This is a summary of the input and output for each activity and the final result
 
 ## License (MIT)
 
-Copyright (c) 2014 Mike Moulton (mike@meltmedia.com)
+Copyright (c) 2014 meltmedia (mike@meltmedia.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
