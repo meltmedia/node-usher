@@ -22,10 +22,12 @@
   "dependencies" : {
     "winston": "*",
     "aws-swf": "*",
-    "aws-sdk": "*",
     "lodash": "*",
     "orchestrator": "*",
     "sequencify": "git://github.com/robrich/sequencify.git"
+  },
+  "peerDependencies": {
+    "aws-sdk": "*"
   },
   "devDependencies": {
     "q": "*",
@@ -34,7 +36,8 @@
     "gulp-jsdoc": "*",
     "gulp-mocha": "*",
     "jshint-stylish": "*",
-    "chai": "*"
+    "chai": "*",
+    "aws-sdk": "*"
   },
   "engines" : {
     "node" : ">= 0.10.0"
