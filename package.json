@@ -1,6 +1,6 @@
 {
   "name" : "usher",
-  "version" : "0.1.2",
+  "version" : "0.1.3",
   "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
   "author" : "Mike Moulton <mike@meltmedia.com>",
   "main" : "index.js",
