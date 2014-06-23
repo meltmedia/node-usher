@@ -4,6 +4,7 @@ var winston = require('winston'),
 
 // Remove console transport unless we are debugging
 winston.remove(winston.transports.Console);
+winston.add(winston.transports.Console, { level: 'debug' });
 
 // Set global AWS configuration
 // accessKeyId and secretAccessKey will be pulled in from the environment automaticaly

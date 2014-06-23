@@ -13,3 +13,9 @@
 ## 0.1.3 (June 18, 2014)
 
 + Moved `aws-sdk` lib to be in `peerDependencies` so that global AWS config can be inherited from parent project
+
+## 0.2.0 (June 23, 2014)
+
++ Child Workflow Support
++ Looping Support
++ Small internal API refactor in support of above features

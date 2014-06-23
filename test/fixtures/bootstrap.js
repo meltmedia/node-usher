@@ -14,6 +14,7 @@ function setup() {
   var domain = '_test_workflow_';
   registerDomain(domain)
     .then(registerWorkflow(domain, 'workflow'))
+    .then(registerWorkflow(domain, 'workflow2'))
     .then(registerActivity(domain, 'activity1'))
     .then(registerActivity(domain, 'activity2'))
     .then(registerActivity(domain, 'activity3'))
@@ -51,7 +52,7 @@ function registerWorkflow(domain, name) {
       domain: domain,
       name: name,
       version: '1.0',
-      defaultTaskList: { name: 'test-workflow-decision-tasklist' },
+      defaultTaskList: { name: 'test-' + name + '-decision-tasklist' },
       defaultChildPolicy: 'TERMINATE'
     },
     function (err, results) {

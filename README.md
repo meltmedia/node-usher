@@ -9,22 +9,16 @@ Note: This library is used to implement [Deciders](http://docs.aws.amazon.com/am
 
 ## Conventions
 
-### Tasks
-
 All actors in the system are considered tasks in the workflow. Every task is named and can optionally have a list of dependencies of other tasks. Tasks execute as soon as their dependencies are met.
 
+### Tasks
+
 + Activity - Represents a SWF Activity in the workflow. When this task executes, the decider will schedule the given activity to run with SWF.
-+ Decision - Represents a binary decision that executed imediatly within the workflow. Deciders can make their decisions based on their input. Like all tasks, the input of the task is a composition of it's dependencies output.
++ Decision - Represents a binary decision that executed immediately within the workflow. Deciders can make their decisions based on their input. Like all tasks, the input of the task is a composition of it's dependencies output.
++ Child - Represents a SWF child workflow. When this task executes, the specified child workflow will execute. The success or failure of this task will mimic that of the child workflow.
++ Loop - Allows for executing fragment workflows repeatedly for a set of input.
 + Transform - A transform task can take it's input, manipulate it in some way, then output it for it's dependents to consume later. Transform tasks, like Decision tasks, execute within the context of the current decision task.
 + Terminate - A terminate task will end the workflow. Termination tasks are only needed when you compose a flow that branches and can have nodes that will never execute.
-
-### Rules
-
-+ Activities should be single concern
-+ Activities depend on the completion of other tasks
-+ Decisions are binary
-+ Decisions depend on the completion of other tasks
-+ An activities input is comprised of the output of it's dependencies and the workflows initial input
 
 ## Install
 
@@ -148,16 +142,16 @@ The following outlines the details of the decisions the workflow will schedule w
 This is a summary of the input and output for each activity and the final result of the workflow execution.
 
 1. `activity1`
-  + input: `[ "_input": "<workflow input>" ]`
+  + input: `{ "_input": "<workflow input>" }`
   + output: `{ "key1": "value 1" }`
 2. `activity2`
-  + input: `[ "_input": "<workflow input>", "activity1": { "key1": "value 1" } ]`
+  + input: `{ "_input": "<workflow input>", "activity1": { "key1": "value 1" } }`
   + output: `{ "key2": "value 2" }`
 3. `activity3`
-  + input: `[ "_input": "<workflow input>", "activity2": { "key2": "value 2" } ]`
+  + input: `{ "_input": "<workflow input>", "activity2": { "key2": "value 2" } }`
   + output: `{ "key3": "value 3" }`
 4. `activity4`
-  + input: `[ "_input": "<workflow input>", "activity3": { "key3": "value 3" } ]`
+  + input: `{ "_input": "<workflow input>", "activity3": { "key3": "value 3" } }`
   + output: `{ "key4": "value 4" }`
 5. Workflow Completion
   + result:
@@ -172,8 +166,8 @@ This is a summary of the input and output for each activity and the final result
 
 ## Documentation
 
++ [More Examples](./examples)
 + [JSDocs](./docs)
-+ [Examples](./examples)
 
 ## License (MIT)
 

@@ -1,6 +1,6 @@
 {
   "name" : "usher",
-  "version" : "0.1.3",
+  "version" : "0.2.0",
   "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
   "author" : "Mike Moulton <mike@meltmedia.com>",
   "main" : "index.js",
@@ -24,6 +24,7 @@
     "aws-swf": "*",
     "lodash": "*",
     "orchestrator": "*",
+    "gonfalon": "*",
     "sequencify": "git://github.com/robrich/sequencify.git"
   },
   "peerDependencies": {
