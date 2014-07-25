@@ -19,3 +19,7 @@
 + Child Workflow Support
 + Looping Support
 + Small internal API refactor in support of above features
+
+## 0.2.1 (July 24, 2014)
+
++ Updating to latest `aws-swf` dependency to support v2.x of the `aws-sdk` library
