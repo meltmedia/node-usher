@@ -23,3 +23,7 @@
 ## 0.2.1 (July 24, 2014)
 
 + Updating to latest `aws-swf` dependency to support v2.x of the `aws-sdk` library
+
+## 0.2.2 (Sept 3, 2014)
+
++ Resolved an uncaught exception when certain tasks failed
