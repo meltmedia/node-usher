@@ -22,7 +22,11 @@ describe('Workflow - Linear Execution', function () {
         .activity('activity3', ['activity2'])
         .activity('activity4', ['activity3'])
         .activity('activity5', ['activity4'])
-        .activity('activity6', ['activity5']);
+        .activity('activity6', ['activity5'], {
+          taskList: function() {
+            return 'test-workflow-activity-tasklist';
+          }
+        });
 
     linearWorkflow.start();
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var usher = require('usher');
 
 /**
@@ -14,10 +16,16 @@ var parentWorkflow = usher.workflow('parent-workflow', 'your-domain-name')
   .activity('activity1')
 
   // child1 workflow will execute once activity1 is complete
-  .child('child1', ['activity1'], 'child-workflow', '1.0');
+  .child('child1', ['activity1'], 'child-workflow', '1.0', {
+    tagList: function (input) {
+      return [
+        'source:' + input.activity1.id // Assuming the output of 'activity1' had a property named 'id'
+      ];
+    }
+  })
 
   // activity2 will execute once child1 workflow is complete
-  .activity('activity2', ['child1'])
+  .activity('activity2', ['child1']);
 
 
 // Define child workflow

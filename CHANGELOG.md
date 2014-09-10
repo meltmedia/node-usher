@@ -27,3 +27,7 @@
 ## 0.2.2 (Sept 3, 2014)
 
 + Resolved an uncaught exception when certain tasks failed
+
+## 0.2.3 (Sept 9, 2014)
+
++ Support for Activity / Workflow options being functions that are evaluated within the context of the activities / workflows input

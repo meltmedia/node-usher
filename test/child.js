@@ -18,7 +18,11 @@ describe('Workflow - Child Execution', function () {
           taskList: 'test-workflow-activity-tasklist'
         })
         .activity('activity1')
-        .child('child1', ['activity1'], 'workflow2', '1.0')
+        .child('child1', ['activity1'], 'workflow2', '1.0', {
+          tagList: function (input) {
+            return [input.activity1.activity1];
+          }
+        })
         .activity('activity2', ['child1']);
 
     childWorkflow = usher
