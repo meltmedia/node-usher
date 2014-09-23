@@ -5,7 +5,7 @@ Usher enables simple, dependency based compositions of activities and decisions 
 
 In the name of simplicity, this library has strong opinions on convention, with the ability to configure and override some of these conventions.
 
-This library can be used to implement [Deciders](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-deciders) and [Activities](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-activities) for AWS [Simple Workflow Service](http://aws.amazon.com/swf/). **If you do not know what these are, this library is not for you (yet).**
+This library can be used to implement [Deciders](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-deciders) and [Activities](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-activities) for AWS [Simple Workflow Service](http://aws.amazon.com/swf/).
 
 
 ## Install
