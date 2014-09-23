@@ -1,24 +1,26 @@
 var chai = require('chai'),
     expect = chai.expect,
-    swf = require('aws-swf'),
     fixtures = require('./fixtures'),
     usher = require('../lib/usher');
 
 
 describe('Workflow - Child Execution', function () {
 
-  this.timeout(31000);
+  this.timeout(71000);
 
   var parentWorkflow, childWorkflow, status, events;
 
   before(function (done) {
     parentWorkflow = usher
-      .workflow('parent-workflow', '_test_workflow_', 'test-workflow-decision-tasklist')
+      .workflow('parent', '_test_workflow_', { taskList: 'test-parent-decision-tasklist' });
+
+    parentWorkflow
+      .version('1.0.0')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
         .activity('activity1')
-        .child('child1', ['activity1'], 'workflow2', '1.0', {
+        .child('child1', ['activity1'], 'child', '1.0.0', {
           tagList: function (input) {
             return [input.activity1.activity1];
           }
@@ -26,7 +28,10 @@ describe('Workflow - Child Execution', function () {
         .activity('activity2', ['child1']);
 
     childWorkflow = usher
-      .workflow('child-workflow', '_test_workflow_', 'test-workflow2-decision-tasklist')
+      .workflow('child', '_test_workflow_', { taskList: 'test-child-decision-tasklist' });
+
+    childWorkflow
+      .version('1.0.0')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
@@ -36,7 +41,7 @@ describe('Workflow - Child Execution', function () {
     parentWorkflow.start();
     childWorkflow.start();
 
-    fixtures.execution.execute({ input: 'test input' }, function (err, s, e) {
+    fixtures.execution.execute('parent', '1.0.0', { input: 'test input' }, function (err, s, e) {
       status = s;
       events = e;
       done(err);

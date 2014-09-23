@@ -1,24 +1,12 @@
 Usher
 =====
 
-This libraries goal is to enable simple, dependency based compositions of activities and decisions for AWS Simple Workflows.
+Usher enables simple, dependency based compositions of activities and decisions for AWS Simple Workflows.
 
 In the name of simplicity, this library has strong opinions on convention, with the ability to configure and override some of these conventions.
 
-Note: This library is used to implement [Deciders](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-deciders) for AWS [Simple Workflow Service](http://aws.amazon.com/swf/). If you do not know what these are, this library is not for you (yet).
+This library can be used to implement [Deciders](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-deciders) and [Activities](http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-actors.html#swf-dev-actors-activities) for AWS [Simple Workflow Service](http://aws.amazon.com/swf/). **If you do not know what these are, this library is not for you (yet).**
 
-## Conventions
-
-All actors in the system are considered tasks in the workflow. Every task is named and can optionally have a list of dependencies of other tasks. Tasks execute as soon as their dependencies are met.
-
-### Tasks
-
-+ Activity - Represents a SWF Activity in the workflow. When this task executes, the decider will schedule the given activity to run with SWF.
-+ Decision - Represents a binary decision that executed immediately within the workflow. Deciders can make their decisions based on their input. Like all tasks, the input of the task is a composition of it's dependencies output.
-+ Child - Represents a SWF child workflow. When this task executes, the specified child workflow will execute. The success or failure of this task will mimic that of the child workflow.
-+ Loop - Allows for executing fragment workflows repeatedly for a set of input.
-+ Transform - A transform task can take it's input, manipulate it in some way, then output it for it's dependents to consume later. Transform tasks, like Decision tasks, execute within the context of the current decision task.
-+ Terminate - A terminate task will end the workflow. Termination tasks are only needed when you compose a flow that branches and can have nodes that will never execute.
 
 ## Install
 
@@ -26,143 +14,68 @@ All actors in the system are considered tasks in the workflow. Every task is nam
 npm install usher --save
 ```
 
-## Example
+## Usage
 
-### Linear Workflow
+### Activities
 
-This is a simple example of 4 activities executing in sequential order.
+This is a simple example of 4 activities being defined to perform some tasks and returning their results. By themselves, these activities will do nothing until executed by a workflow. (To see how these activities are run, see the workflow example below.)
 
-Note: This example makes assumptions that you have some prior experience with SWF, in particular how decision tasks are scheduled.
-
-This example does not cover the details of the activities themselves, or the initial execution of the workflow.
-
-#### The Code
 ``` javascript
 var usher = require('usher');
 
-var workflow = usher.workflow('linear-workflow', 'my-domain-name')
-  .activity('activity1')
-  .activity('activity2', ['activity1'])
-  .activity('activity3', ['activity2'])
-  .activity('activity4', ['activity3']);
+var activities = usher
+  .activities('linear-activities', 'my-domain-name')
+    .activity('activity1', '1.0.0', function (task) {
+      task.success({ "key1": "value 1" });
+    })
+    .activity('activity2', '1.0.0', function (task) {
+      task.success({ "key2": "value 2" });
+    })
+    .activity('activity3', '1.0.0', function (task) {
+      task.success({ "key3": "value 3" });
+    })
+    .activity('activity4', '1.0.0', function (task) {
+      task.success({ "key4": "old value 4" });
+    })
+    .activity('activity4', '1.1.0', function (task) {
+      task.success({ "key4": "value 4" });
+    });
+
+activities.start();
+```
+
+### Workflow (Decider) - Linear
+
+This is a simple example of the workflow composition that will run the previously defined 4 activities in sequential order when the workflow is executed.
+
+``` javascript
+var usher = require('usher');
+
+var workflow = usher
+  .workflow('linear-workflow', 'my-domain-name')
+    .version('1.0.0')
+      .activity('activity1')
+      .activity('activity2', ['activity1'])
+      .activity('activity3', ['activity2'])
+      .activity('activity4', ['activity3'], { version: '1.1.0' });
 
 workflow.start();
 ```
 
-#### The Decider
+### Running a Workflow
 
-The creation of the above workflow is broken into 2 primary parts. First the logic of the decider is defined with the `activity()` calls. Next the call to `start()` begins continuously polling for decision tasks (See [PollForDecisionTask](http://docs.aws.amazon.com/amazonswf/latest/apireference/API_PollForDecisionTask.html)).
+Given the above defined `linear-workflow`, you could run an execution of the workflow in the following way.
 
-As far as SWF is concerned, a PollForDecisionTask only requires 2 primary inputs, the `domain` and the `taskList`. For the above workflow, those values are:
-+ `domain`: 'my-domain-name'
-+ `taskList`: 'linear-workflow-tasklist'
+``` javascript
+var usher = require('usher');
 
-#### The Decisions
+// This assumes the workflow 'linerar-workflow' has already been defined previously
+var workflow = usher.workflow('linear-workflow', 'my-domain-name');
 
-The following outlines the details of the decisions the workflow will schedule with SWF for each workflow execution. For more information on this format see the SWF API for [RespondDecisionTaskCompleted](http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RespondDecisionTaskCompleted.html)
-
-+ `activity1`
-``` json
-"scheduleActivityTaskDecisionAttributes": {
-  "activityId": "activity1",
-  "activityType": {
-    "name": "activity1",
-    "version": "1.0"
-  },
-  "heartbeatTimeout": "60",
-  "input": "[ \"_input\": \"<workflow input>\" ]",
-  "scheduleToCloseTimeout": "360",
-  "scheduleToStartTimeout": "60",
-  "startToCloseTimeout": "300",
-  "taskList": {
-    "name": "activity1-tasklist"
-  }
-}
+workflow.execute({ key: 'value '}, function (err, runId, workflowId) {
+  // once the workflow has started
+});
 ```
-
-+ `activity2`
-``` json
-"scheduleActivityTaskDecisionAttributes": {
-  "activityId": "activity2",
-  "activityType": {
-    "name": "activity2",
-    "version": "1.0"
-  },
-  "heartbeatTimeout": "60",
-  "input": "[ \"_input\": \"<workflow input>\", \"activity1\": \"{ \"key1\": \"value 1\" }\" ]",
-  "scheduleToCloseTimeout": "360",
-  "scheduleToStartTimeout": "60",
-  "startToCloseTimeout": "300",
-  "taskList": {
-    "name": "activity2-tasklist"
-  }
-}
-```
-
-+ `activity3`
-``` json
-"scheduleActivityTaskDecisionAttributes": {
-  "activityId": "activity3",
-  "activityType": {
-    "name": "activity3",
-    "version": "1.0"
-  },
-  "heartbeatTimeout": "60",
-  "input": "[ \"_input\": \"<workflow input>\", \"activity2\": \"{ \"key2\": \"value 2\" }\" ]",
-  "scheduleToCloseTimeout": "360",
-  "scheduleToStartTimeout": "60",
-  "startToCloseTimeout": "300",
-  "taskList": {
-    "name": "activity3-tasklist"
-  }
-}
-```
-
-+ `activity4`
-``` json
-"scheduleActivityTaskDecisionAttributes": {
-  "activityId": "activity4",
-  "activityType": {
-    "name": "activity4",
-    "version": "1.0"
-  },
-  "heartbeatTimeout": "60",
-  "input": "[ \"_input\": \"<workflow input>\", \"activity3\": \"{ \"key3\": \"value 3\" }\" ]",
-  "scheduleToCloseTimeout": "360",
-  "scheduleToStartTimeout": "60",
-  "startToCloseTimeout": "300",
-  "taskList": {
-    "name": "activity4-tasklist"
-  }
-}
-```
-
-#### Results
-
-This is a summary of the input and output for each activity and the final result of the workflow execution.
-
-1. `activity1`
-  + input: `{ "_input": "<workflow input>" }`
-  + output: `{ "key1": "value 1" }`
-2. `activity2`
-  + input: `{ "_input": "<workflow input>", "activity1": { "key1": "value 1" } }`
-  + output: `{ "key2": "value 2" }`
-3. `activity3`
-  + input: `{ "_input": "<workflow input>", "activity2": { "key2": "value 2" } }`
-  + output: `{ "key3": "value 3" }`
-4. `activity4`
-  + input: `{ "_input": "<workflow input>", "activity3": { "key3": "value 3" } }`
-  + output: `{ "key4": "value 4" }`
-5. Workflow Completion
-  + result:
-    ``` json
-    {
-      "activity1": { "key1": "value 1" },
-      "activity2": { "key2": "value 2" },
-      "activity3": { "key3": "value 3" },
-      "activity4": { "key4": "value 4" }
-    }
-    ```
 
 ## Documentation
 
