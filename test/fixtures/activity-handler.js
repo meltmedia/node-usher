@@ -10,7 +10,7 @@ module.exports = {
 
 var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workflow-activity-tasklist' })
   .activity('activity1', '*', function (task) {
-    task.success({ activity1: 'Activity 1 output' });
+    task.success({ activity1: 'Activity 1 output', input: task.input });
   })
   .activity('activity2', '*', function (task) {
     task.success({ activity2: 'Activity 2 output' });

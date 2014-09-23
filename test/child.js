@@ -66,7 +66,7 @@ describe('Workflow - Child Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output' });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
     expect(events.childworkflow_results('child1')).to.deep.equal({"activity3":{"activity3":"Activity 3 output"},"activity4":{"activity4":"Activity 4 output"}});
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
   });
