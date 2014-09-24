@@ -13,14 +13,22 @@ module.exports = {
 function setup() {
   var domain = '_test_workflow_';
   registerDomain(domain)
-    .then(registerWorkflow(domain, 'workflow'))
-    .then(registerWorkflow(domain, 'workflow2'))
+    .then(registerWorkflow(domain, 'activity'))
+    .then(registerWorkflow(domain, 'branch'))
+    .then(registerWorkflow(domain, 'parent'))
+    .then(registerWorkflow(domain, 'child'))
+    .then(registerWorkflow(domain, 'linear'))
+    .then(registerWorkflow(domain, 'loop'))
     .then(registerActivity(domain, 'activity1'))
     .then(registerActivity(domain, 'activity2'))
     .then(registerActivity(domain, 'activity3'))
     .then(registerActivity(domain, 'activity4'))
     .then(registerActivity(domain, 'activity5'))
-    .then(registerActivity(domain, 'activity6'));
+    .then(registerActivity(domain, 'activity6'))
+    .then(registerActivity(domain, 'test-activity1', '1.0.0', 'test-activity-poller-tasklist'))
+    .then(registerActivity(domain, 'test-activity1', '1.1.0', 'test-activity-poller-tasklist'))
+    .then(registerActivity(domain, 'test-activity2', '1.0.0', 'test-activity-poller-tasklist'))
+    .then(registerActivity(domain, 'test-activity2', '1.1.0', 'test-activity-poller-tasklist'));
 }
 
 
@@ -44,14 +52,14 @@ function registerDomain(name) {
 }
 
 
-function registerWorkflow(domain, name) {
+function registerWorkflow(domain, name, version) {
   var defer = Q.defer();
   var swf = new AWS.SimpleWorkflow();
 
   swf.registerWorkflowType({
       domain: domain,
       name: name,
-      version: '1.0',
+      version: version || '1.0.0',
       defaultTaskList: { name: 'test-' + name + '-decision-tasklist' },
       defaultChildPolicy: 'TERMINATE'
     },
@@ -66,15 +74,15 @@ function registerWorkflow(domain, name) {
   return defer.promise;
 }
 
-function registerActivity(domain, name) {
+function registerActivity(domain, name, version, tasklist) {
   var defer = Q.defer();
   var swf = new AWS.SimpleWorkflow();
 
   swf.registerActivityType({
       domain: domain,
       name: name,
-      version: '1.0',
-      defaultTaskList: { name: 'test-workflow-activity-tasklist' },
+      version: version || '1.0.0',
+      defaultTaskList: { name: tasklist || 'test-workflow-activity-tasklist' },
       defaultTaskHeartbeatTimeout: '30',
       defaultTaskScheduleToCloseTimeout: '30',
       defaultTaskScheduleToStartTimeout: '30',

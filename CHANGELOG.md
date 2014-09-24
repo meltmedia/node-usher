@@ -31,3 +31,11 @@
 ## 0.2.3 (Sept 9, 2014)
 
 + Support for Activity / Workflow options being functions that are evaluated within the context of the activities / workflows input
+
+## 0.3.0 (Sept 19, 2014)
+
+** WARNING: This release introduced breaking API changes in support of proper version handling of workflows **
+
++ Expanding scope of Usher to include the ability to manage Activities as well as Deciders
++ Full version support for Activities and Deciders using [semver](http://semver.org/) v2.0
+  + This means that deciders / activities can be configured to match explicit or ranges of versions (think NPM module versions)

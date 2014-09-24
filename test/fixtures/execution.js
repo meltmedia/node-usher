@@ -10,20 +10,20 @@ module.exports = {
 };
 
 
-function execute(input, cb) {
+function execute(name, version, input, cb) {
   var workflow = new swf.Workflow({
     'domain': '_test_workflow_',
     'workflowType': {
-      'name': 'workflow',
-      'version': '1.0'
+      'name': name,
+      'version': version
     },
-    'taskList': { "name": 'test-workflow-decision-tasklist' },
+    'taskList': { name: 'test-' + name + '-decision-tasklist' },
     'executionStartToCloseTimeout': '10',
     'taskStartToCloseTimeout': '10',
     'childPolicy': 'TERMINATE'
   }, new AWS.SimpleWorkflow());
 
-  var workflowExecution = workflow.start(input, function (err, id) {
+  var workflowExecution = workflow.start({ input: JSON.stringify(input) }, function (err, id) {
     if (err) {
       return cb(err);
     }
@@ -60,6 +60,7 @@ function checkStatus(runId, workflowId, cb) {
               return cb(err);
             }
             var eventList = new swf.EventList(events.events);
+
             return cb(null, results.executionInfo.closeStatus, eventList);
           });
       }

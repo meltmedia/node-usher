@@ -29,6 +29,18 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
+							<a href="ActivityPoller.html">ActivityPoller</a>
+						</li>
+						
+						<li>
+							<a href="ActivityTask.html">ActivityTask</a>
+						</li>
+						
+						<li>
+							<a href="DecisionPoller.html">DecisionPoller</a>
+						</li>
+						
+						<li>
 							<a href="Fragment.html">Fragment</a>
 						</li>
 						
@@ -37,7 +49,7 @@
 						</li>
 						
 						<li>
-							<a href="Workflow.html">Workflow</a>
+							<a href="WorkflowVersion.html">WorkflowVersion</a>
 						</li>
 						
 
@@ -82,8 +94,168 @@
 
     <section>
         <article><h1 id="usher">Usher</h1>
-<p>This libraries goal is to enable simple, dependency based compositions of activities and decisions for AWS Simple Workflows.</p>
-<p>In the name of simplicity, this library has strong opinions on convention, with the ability to configure and override some of these conventions.</p>
+<p>Usher enables simple, dependency based compositions of activities and decisions for AWS Simple Workflows.</p>
+<h2 id="activity-conventions">Activity Conventions</h2>
+<p>Activities are defined in a named group of activities tied to a single <code>taskList</code>. Each activity has a name and a version where the version is a valid <a href="http://semver.org">Semver</a> version or range. Activities have access to their input and are expected to return a success or failure status. If successful, an optional payload can be provided.</p>
+<h2 id="workflow-decider-conventions">Workflow (Decider) Conventions</h2>
+<p>Workflows are named units representing an orchestrated set of business tasks (ie: ship order, register user, run report). Workflows are tied to a specific SWF domain. For each named workflow, you can defined versions of the workflow following the <a href="http://semver.org">semver</a> spec. Versioned workflows are composed of tasks where every task is named and can optionally have a list of dependencies of other tasks. Tasks execute as soon as their dependencies are met.</p>
+<h3 id="tasks">Tasks</h3>
+<ul>
+<li>Activity - Represents a SWF Activity in the workflow. When this task executes, the decider will schedule the given activity to run with SWF.</li>
+<li>Decision - Represents a binary decision that executed immediately within the workflow. Deciders can make their decisions based on their input. Like all tasks, the input of the task is a composition of it&#39;s dependencies output.</li>
+<li>Child - Represents a SWF child workflow. When this task executes, the specified child workflow will execute. The success or failure of this task will mimic that of the child workflow.</li>
+<li>Loop - Allows for executing fragment workflows repeatedly for a set of input.</li>
+<li>Transform - A transform task can take it&#39;s input, manipulate it in some way, then output it for it&#39;s dependents to consume later. Transform tasks, like Decision tasks, execute within the context of the current decision task.</li>
+<li>Terminate - A terminate task will end the workflow. Termination tasks are only needed when you compose a flow that branches and can have nodes that will never execute.</li>
+</ul>
+<h3 id="execution-details">Execution Details</h3>
+<p>Given the following activity and workflow definition:</p>
+<pre><code class="lang-javascript">var usher = require(&#39;usher&#39;);
+
+// Define activities used by workflow
+var activities = usher
+  .activities(&#39;linear-activities&#39;, &#39;my-domain-name&#39;)
+    .activity(&#39;activity1&#39;, &#39;1.0.0&#39;, function (task) {
+      task.success({ &quot;key1&quot;: &quot;value 1&quot; });
+    })
+    .activity(&#39;activity2&#39;, &#39;1.0.0&#39;, function (task) {
+      task.success({ &quot;key2&quot;: &quot;value 2&quot; });
+    })
+    .activity(&#39;activity3&#39;, &#39;1.0.0&#39;, function (task) {
+      task.success({ &quot;key3&quot;: &quot;value 3&quot; });
+    })
+    .activity(&#39;activity4&#39;, &#39;1.0.0&#39;, function (task) {
+      task.success({ &quot;key4&quot;: &quot;old value 4&quot; });
+    })
+    .activity(&#39;activity4&#39;, &#39;1.1.0&#39;, function (task) {
+      task.success({ &quot;key4&quot;: &quot;value 4&quot; });
+    });
+
+// Define the workflow
+var workflow = usher
+  .workflow(&#39;linear-workflow&#39;, &#39;my-domain-name&#39;)
+    .version(&#39;1.0.0&#39;)
+      .activity(&#39;activity1&#39;)
+      .activity(&#39;activity2&#39;, [&#39;activity1&#39;])
+      .activity(&#39;activity3&#39;, [&#39;activity2&#39;])
+      .activity(&#39;activity4&#39;, [&#39;activity3&#39;], { version: &#39;1.1.0&#39; });
+
+// Start listening
+activities.start();
+workflow.start();
+</code></pre>
+<p>For each execution of the workflow, Usher will make decisions as outlined below.</p>
+<h4 id="the-decisions">The Decisions</h4>
+<p>The following outlines the details of the decisions the workflow will schedule with SWF for each workflow execution. For more information on this format see the SWF API for <a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RespondDecisionTaskCompleted.html">RespondDecisionTaskCompleted</a></p>
+<ul>
+<li><p><code>activity1</code></p>
+<pre><code class="lang-json">&quot;scheduleActivityTaskDecisionAttributes&quot;: {
+&quot;activityId&quot;: &quot;activity1&quot;,
+&quot;activityType&quot;: {
+  &quot;name&quot;: &quot;activity1&quot;,
+  &quot;version&quot;: &quot;1.0&quot;
+},
+&quot;heartbeatTimeout&quot;: &quot;60&quot;,
+&quot;input&quot;: &quot;[ \&quot;_input\&quot;: \&quot;&lt;workflow input&gt;\&quot; ]&quot;,
+&quot;scheduleToCloseTimeout&quot;: &quot;360&quot;,
+&quot;scheduleToStartTimeout&quot;: &quot;60&quot;,
+&quot;startToCloseTimeout&quot;: &quot;300&quot;,
+&quot;taskList&quot;: {
+  &quot;name&quot;: &quot;activity1-tasklist&quot;
+}
+}
+</code></pre>
+</li>
+<li><p><code>activity2</code></p>
+<pre><code class="lang-json">&quot;scheduleActivityTaskDecisionAttributes&quot;: {
+&quot;activityId&quot;: &quot;activity2&quot;,
+&quot;activityType&quot;: {
+  &quot;name&quot;: &quot;activity2&quot;,
+  &quot;version&quot;: &quot;1.0&quot;
+},
+&quot;heartbeatTimeout&quot;: &quot;60&quot;,
+&quot;input&quot;: &quot;[ \&quot;_input\&quot;: \&quot;&lt;workflow input&gt;\&quot;, \&quot;activity1\&quot;: \&quot;{ \&quot;key1\&quot;: \&quot;value 1\&quot; }\&quot; ]&quot;,
+&quot;scheduleToCloseTimeout&quot;: &quot;360&quot;,
+&quot;scheduleToStartTimeout&quot;: &quot;60&quot;,
+&quot;startToCloseTimeout&quot;: &quot;300&quot;,
+&quot;taskList&quot;: {
+  &quot;name&quot;: &quot;activity2-tasklist&quot;
+}
+}
+</code></pre>
+</li>
+<li><p><code>activity3</code></p>
+<pre><code class="lang-json">&quot;scheduleActivityTaskDecisionAttributes&quot;: {
+&quot;activityId&quot;: &quot;activity3&quot;,
+&quot;activityType&quot;: {
+  &quot;name&quot;: &quot;activity3&quot;,
+  &quot;version&quot;: &quot;1.0&quot;
+},
+&quot;heartbeatTimeout&quot;: &quot;60&quot;,
+&quot;input&quot;: &quot;[ \&quot;_input\&quot;: \&quot;&lt;workflow input&gt;\&quot;, \&quot;activity2\&quot;: \&quot;{ \&quot;key2\&quot;: \&quot;value 2\&quot; }\&quot; ]&quot;,
+&quot;scheduleToCloseTimeout&quot;: &quot;360&quot;,
+&quot;scheduleToStartTimeout&quot;: &quot;60&quot;,
+&quot;startToCloseTimeout&quot;: &quot;300&quot;,
+&quot;taskList&quot;: {
+  &quot;name&quot;: &quot;activity3-tasklist&quot;
+}
+}
+</code></pre>
+</li>
+<li><p><code>activity4</code></p>
+<pre><code class="lang-json">&quot;scheduleActivityTaskDecisionAttributes&quot;: {
+&quot;activityId&quot;: &quot;activity4&quot;,
+&quot;activityType&quot;: {
+  &quot;name&quot;: &quot;activity4&quot;,
+  &quot;version&quot;: &quot;1.0&quot;
+},
+&quot;heartbeatTimeout&quot;: &quot;60&quot;,
+&quot;input&quot;: &quot;[ \&quot;_input\&quot;: \&quot;&lt;workflow input&gt;\&quot;, \&quot;activity3\&quot;: \&quot;{ \&quot;key3\&quot;: \&quot;value 3\&quot; }\&quot; ]&quot;,
+&quot;scheduleToCloseTimeout&quot;: &quot;360&quot;,
+&quot;scheduleToStartTimeout&quot;: &quot;60&quot;,
+&quot;startToCloseTimeout&quot;: &quot;300&quot;,
+&quot;taskList&quot;: {
+  &quot;name&quot;: &quot;activity4-tasklist&quot;
+}
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="results">Results</h4>
+<p>This is a summary of the input and output for each activity and the final result of the workflow execution.</p>
+<ol>
+<li><code>activity1</code><ul>
+<li>input: <code>{ &quot;_input&quot;: &quot;&lt;workflow input&gt;&quot; }</code></li>
+<li>output: <code>{ &quot;key1&quot;: &quot;value 1&quot; }</code></li>
+</ul>
+</li>
+<li><code>activity2</code><ul>
+<li>input: <code>{ &quot;_input&quot;: &quot;&lt;workflow input&gt;&quot;, &quot;activity1&quot;: { &quot;key1&quot;: &quot;value 1&quot; } }</code></li>
+<li>output: <code>{ &quot;key2&quot;: &quot;value 2&quot; }</code></li>
+</ul>
+</li>
+<li><code>activity3</code><ul>
+<li>input: <code>{ &quot;_input&quot;: &quot;&lt;workflow input&gt;&quot;, &quot;activity2&quot;: { &quot;key2&quot;: &quot;value 2&quot; } }</code></li>
+<li>output: <code>{ &quot;key3&quot;: &quot;value 3&quot; }</code></li>
+</ul>
+</li>
+<li><code>activity4</code><ul>
+<li>input: <code>{ &quot;_input&quot;: &quot;&lt;workflow input&gt;&quot;, &quot;activity3&quot;: { &quot;key3&quot;: &quot;value 3&quot; } }</code></li>
+<li>output: <code>{ &quot;key4&quot;: &quot;value 4&quot; }</code></li>
+</ul>
+</li>
+<li>Workflow Completion<ul>
+<li>result:<pre><code class="lang-json">{
+ &quot;activity1&quot;: { &quot;key1&quot;: &quot;value 1&quot; },
+ &quot;activity2&quot;: { &quot;key2&quot;: &quot;value 2&quot; },
+ &quot;activity3&quot;: { &quot;key3&quot;: &quot;value 3&quot; },
+ &quot;activity4&quot;: { &quot;key4&quot;: &quot;value 4&quot; }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
 </article>
     </section>
 
@@ -106,7 +278,7 @@
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Mon Jun 23 2014 14:32:21 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Tue Sep 23 2014 14:33:54 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

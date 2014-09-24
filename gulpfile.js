@@ -9,11 +9,6 @@ gulp.task('lint', function () {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('test2', function () {
-  return gulp.src(['test/setup.js', 'test/loop.js', '!test/fixtures/**/*.js'])
-    .pipe(mocha({ reporter: 'spec' }));
-});
-
 gulp.task('test', function () {
   return gulp.src(['test/**/*.js', '!test/fixtures/**/*.js'])
     .pipe(mocha({ reporter: 'spec' }));

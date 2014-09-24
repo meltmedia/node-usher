@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Usher Class: Usher</title>
+	<title>Usher Class: ActivityTask</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -69,12 +69,12 @@
 					
 
 
-	<h1 class="page-title">Class: Usher</h1>
+	<h1 class="page-title">Class: ActivityTask</h1>
 <section>
 
 <header>
     <h2>
-    Usher
+    ActivityTask
     </h2>
     
 </header>
@@ -86,7 +86,7 @@
     
         
 <dt>
-    <h4 class="name" id="Usher"><span class="type-signature"></span>new Usher<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ActivityTask"><span class="type-signature"></span>new ActivityTask<span class="signature">(task)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -94,7 +94,7 @@
     
     
     <div class="description">
-        Manages workflows
+        The context for the execution of the activity
     </div>
     
 
@@ -102,6 +102,55 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>task</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The raw `aws-swf` activity task</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -127,7 +176,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="usher.js.html">usher.js</a>, <a href="usher.js.html#sunlight-1-line-19">line 19</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-19">line 19</a>
     </li></ul></dd>
     
 
@@ -173,7 +222,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="activities"><span class="type-signature"></span>activities<span class="signature">(name, domain, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {<a href="ActivityPoller.html">ActivityPoller</a>}</span></h4>
+    <h4 class="name" id="failed"><span class="type-signature"></span>failed<span class="signature">(name, <span class="optional">err</span>, <span class="optional">retriable</span>, <span class="optional">cb</span>)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -181,7 +230,7 @@
     
     
     <div class="description">
-        Create or retrieve a activity poller
+        Execute if the activity failed
     </div>
     
 
@@ -241,45 +290,14 @@
 
             
 
-            <td class="description last">The name of the poller.</td>
+            <td class="description last">A unique name for the failure</td>
         </tr>
 
 	
 
         <tr>
             
-                <td class="name"><code>domain</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The AWS SWF domain name to execute the pollers activities in.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>err</code></td>
             
 
             <td class="type">
@@ -305,149 +323,73 @@
 
             
 
-            <td class="description last">Additional SWF options used when polling for activities
-                            (taskList=<name>-tasklist)</td>
+            <td class="description last">The reason for the failure</td>
         </tr>
 
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="usher.js.html">usher.js</a>, <a href="usher.js.html#sunlight-1-line-88">line 88</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    - A activity poller instance where specific activities can be defined
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="ActivityPoller.html">ActivityPoller</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="fragment"><span class="type-signature"></span>fragment<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="Fragment.html">Fragment</a>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Create or retrieve a workflow fragment
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
 	
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>retriable</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">boolean</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">The name of the fragment.</td>
+            <td class="description last">A hint to if the activity should be attempted again</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>cb</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Callback to run once we have successfuly informed SWF of our status</td>
         </tr>
 
 	
@@ -479,7 +421,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="usher.js.html">usher.js</a>, <a href="usher.js.html#sunlight-1-line-65">line 65</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-77">line 77</a>
     </li></ul></dd>
     
 
@@ -500,29 +442,6 @@
     
     
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    - A workflow fragment instance
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="Fragment.html">Fragment</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
     
     
 </dd>
@@ -530,7 +449,7 @@
         
             
 <dt>
-    <h4 class="name" id="workflow"><span class="type-signature"></span>workflow<span class="signature">(name, domain, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {<a href="DecisionPoller.html">DecisionPoller</a>}</span></h4>
+    <h4 class="name" id="success"><span class="type-signature"></span>success<span class="signature">(output, <span class="optional">cb</span>)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -538,7 +457,7 @@
     
     
     <div class="description">
-        Create or retrieve a workflow
+        Execute once the activity has completed successfuly
     </div>
     
 
@@ -574,75 +493,44 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The name of the workflow.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>domain</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The AWS SWF domain name to execute this workflow in.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>output</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The results of the activity, if any</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>cb</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
 
 
             
@@ -662,8 +550,7 @@
 
             
 
-            <td class="description last">Additional SWF options used when creating and executing this workflow
-                            (taskList, tagList, childPolicy, executionStartToCloseTimeout, taskStartToCloseTimeout)</td>
+            <td class="description last">Callback to run once we have successfuly informed SWF of our status</td>
         </tr>
 
 	
@@ -695,7 +582,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="usher.js.html">usher.js</a>, <a href="usher.js.html#sunlight-1-line-44">line 44</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-52">line 52</a>
     </li></ul></dd>
     
 
@@ -716,29 +603,6 @@
     
     
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    - A workflow poller where specific versions of a workflow can be defined
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="DecisionPoller.html">DecisionPoller</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
     
     
 </dd>

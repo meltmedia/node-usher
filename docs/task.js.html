@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Usher Source: usher.js</title>
+	<title>Usher Source: activity/task.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -69,7 +69,7 @@
 					
 
 
-		<h1 class="page-title">Source: usher.js</h1>
+		<h1 class="page-title">Source: activity/task.js</h1>
     
     <section>
         <article>
@@ -80,103 +80,96 @@
 
 'use strict';
 
-var util = require('util'),
-    events = require('events'),
-    _ = require('lodash'),
-    Fragment = require('./decider/fragment'),
-    WorkflowPoller = require('./decider/poller'),
-    ActivityPoller = require('./activity/poller');
+var winston = require('winston');
+
+
+module.exports = ActivityTask;
+
 
 /**
- * Manages workflows
+ * The context for the execution of the activity
  * @constructor
+ * @param {string} task - The raw `aws-swf` activity task
  */
-function Usher() {
-  if (!(this instanceof Usher)) {
-    return new Usher();
+function ActivityTask(task) {
+  if (!(this instanceof ActivityTask)) {
+    return new ActivityTask(task);
   }
 
-  events.EventEmitter.call(this);
+  this.input = {};
 
-  this.workflows = {};
-  this.fragments = {};
-  this.pollers = {};
+  if (task.config.input) {
+    this.input = JSON.parse(task.config.input);
+  }
+
+  // Depending on the language of the Decider impl, this can be an Array or Object
+  // This is a big assumption, maybe make this configurable
+  if (Array.isArray(this.input)) {
+    this.input = this.input[0];
+  }
+
+  this.activityId = task.config.activityId;
+  this.activityType = task.config.activityType;
+  this.startedEventId = task.config.startedEventId;
+  this.taskToken = task.config.taskToken;
+  this.workflowExecution = task.config.workflowExecution;
+
+  this._task = task;
 }
 
 
-// Make Usher an EventEmitter
-util.inherits(Usher, events.EventEmitter);
-
-
 /**
- * Create or retrieve a workflow
- * @param {string} name - The name of the workflow.
- * @param {string} domain - The AWS SWF domain name to execute this workflow in.
- * @param {object} [options] - Additional SWF options used when creating and executing this workflow
- *                             (taskList, tagList, childPolicy, executionStartToCloseTimeout, taskStartToCloseTimeout)
- * @returns {DecisionPoller} - A workflow poller where specific versions of a workflow can be defined
+ * Execute once the activity has completed successfuly
+ *
+ * @param {object} output - The results of the activity, if any
+ * @param {function} [cb] - Callback to run once we have successfuly informed SWF of our status
  */
-Usher.prototype.workflow = function workflow(name, domain, options) {
+ActivityTask.prototype.success = function (output, cb) {
+  var self = this;
 
-  var id = name + '-' + domain,
-      result = this.workflows[id];
+  cb = cb || function () {};
 
-  // If we are defining a new workflow
-  if (_.isUndefined(result)) {
-    // New poller
-    result = new WorkflowPoller(name, domain, options);
-    this.workflows[id] = result;
-  }
+  winston.log('debug', 'Activity task: %s completed successfuly', this.activityType.name);
 
-  return result;
+  this._task.respondCompleted(output, function (err) {
+    if (err) {
+      return winston.log('warn', 'Unable to complete activity task: %s due to: %s', self.activityId, err);
+    }
+    winston.log('verbose', 'Completed activity task: %s', self.activityId);
+    cb(err);
+  });
 };
 
 
 /**
- * Create or retrieve a workflow fragment
- * @param {string} name - The name of the fragment.
- * @returns {Fragment} - A workflow fragment instance
+ * Execute if the activity failed
+ *
+ * @param {string} name - A unique name for the failure
+ * @param {object} [err] - The reason for the failure
+ * @param {boolean} [retriable] - A hint to if the activity should be attempted again
+ * @param {function} [cb] - Callback to run once we have successfuly informed SWF of our status
  */
-Usher.prototype.fragment = function fragment(name) {
+ActivityTask.prototype.failed = function (name, err, retriable, cb) {
+  var self = this;
 
-  var result = this.fragments[name];
+  cb = cb || function () {};
 
-  // If we are defining a new workflow
-  if (_.isUndefined(result)) {
-    // New workflow
-    result = new Fragment(name);
-    this.fragments[name] = result;
-  }
+  winston.log('debug', 'Activity task: %s failed, due to: %s', this.activityType.name, name);
 
-  return result;
+  var message = {
+    name: name,
+    retriable: retriable || false,
+    message: err.message || err
+  };
+
+  this._task.respondFailed(name, JSON.stringify(message), function (e) {
+    if (e) {
+      return winston.log('warn', 'Unable to fail activity task: %s due to:', self.activityId, e);
+    }
+    winston.log('warn', 'Failed activity task: %s due to:', self.activityId, message);
+    cb(e);
+  });
 };
-
-
-/**
- * Create or retrieve a activity poller
- * @param {string} name - The name of the poller.
- * @param {string} domain - The AWS SWF domain name to execute the pollers activities in.
- * @param {object} [options] - Additional SWF options used when polling for activities
- *                             (taskList=&lt;name>-tasklist)
- * @returns {ActivityPoller} - A activity poller instance where specific activities can be defined
- */
-Usher.prototype.activities = function activities(name, domain, options) {
-
-  var id = name + '-' + domain,
-      result = this.pollers[id];
-
-  // If we are defining a new workflow
-  if (_.isUndefined(result)) {
-    // New poller
-    result = new ActivityPoller(name, domain, options);
-    this.pollers[id] = result;
-  }
-
-  return result;
-};
-
-
-module.exports = new Usher();
 </pre>
         </article>
     </section>

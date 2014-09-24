@@ -1,15 +1,14 @@
 var chai = require('chai'),
     expect = chai.expect,
-    swf = require('aws-swf'),
     fixtures = require('./fixtures'),
     usher = require('../lib/usher');
 
 
 describe('Workflow - Loop Execution', function () {
 
-  this.timeout(31000);
+  this.timeout(71000);
 
-  var parentWorkflow, fragment, status, events;
+  var loopWorkflow, fragment, status, events;
 
   before(function (done) {
     fragment = usher
@@ -20,8 +19,11 @@ describe('Workflow - Loop Execution', function () {
         .activity('activity3')
         .activity('activity4', ['activity3']);
 
-    parentWorkflow = usher
-      .workflow('loop-workflow', '_test_workflow_', 'test-workflow-decision-tasklist')
+    loopWorkflow = usher
+      .workflow('loop', '_test_workflow_', { taskList: 'test-loop-decision-tasklist' });
+
+    loopWorkflow
+      .version('1.0.0')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
@@ -31,9 +33,9 @@ describe('Workflow - Loop Execution', function () {
         })
         .activity('activity2', ['loop1']);
 
-    parentWorkflow.start();
+    loopWorkflow.start();
 
-    fixtures.execution.execute({ input: 'test input' }, function (err, s, e) {
+    fixtures.execution.execute('loop', '1.0.0', { input: 'test input' }, function (err, s, e) {
       status = s;
       events = e;
       done(err);
@@ -41,7 +43,7 @@ describe('Workflow - Loop Execution', function () {
   });
 
   after(function () {
-    parentWorkflow.stop();
+    loopWorkflow.stop();
   });
 
   it('should execute a looping workflow successfuly', function () {
@@ -56,7 +58,7 @@ describe('Workflow - Loop Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output' });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
     expect(events.results('loop1-0-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
     expect(events.results('loop1-0-activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
     expect(events.results('loop1-1-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });

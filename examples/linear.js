@@ -11,18 +11,21 @@ var usher = require('usher');
  */
 
 // Define workflow
-var linearWorkflow = usher.workflow('linear-workflow', 'your-domain-name')
-  // activity1 is the entry point
-  .activity('activity1')
+var linearWorkflow = usher.workflow('linear-workflow', 'your-domain-name');
 
-  // activity2 will execute once activity1 is complete
-  .activity('activity2', ['activity1'])
+linearWorkflow
+  .version('1.0.0')
+    // activity1 is the entry point
+    .activity('activity1')
 
-  // activity3 will execute once activity2 is complete
-  .activity('activity3', ['activity2'])
+    // activity2 will execute once activity1 is complete
+    .activity('activity2', ['activity1'])
 
-  // activity4 will execute once activity3 is complete
-  .activity('activity4', ['activity3']);
+    // activity3 will execute once activity2 is complete
+    .activity('activity3', ['activity2'])
+
+    // activity4 will execute once activity3 is complete
+    .activity('activity4', ['activity3']);
 
 // Start polling for decision tasks
 linearWorkflow.start();

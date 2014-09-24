@@ -1,19 +1,21 @@
 var chai = require('chai'),
     expect = chai.expect,
-    swf = require('aws-swf'),
     fixtures = require('./fixtures'),
     usher = require('../lib/usher');
 
 
 describe('Workflow - Linear Execution', function () {
 
-  this.timeout(31000);
+  this.timeout(71000);
 
   var linearWorkflow, status, events;
 
   before(function (done) {
     linearWorkflow = usher
-      .workflow('linearWorkflow', '_test_workflow_', 'test-workflow-decision-tasklist')
+      .workflow('linear', '_test_workflow_', { taskList: 'test-linear-decision-tasklist' });
+
+    linearWorkflow
+      .version('1.0.0')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
@@ -30,7 +32,7 @@ describe('Workflow - Linear Execution', function () {
 
     linearWorkflow.start();
 
-    fixtures.execution.execute({ input: 'test input' }, function (err, s, e) {
+    fixtures.execution.execute('linear', '1.0.0', { input: 'test input' }, function (err, s, e) {
       status = s;
       events = e;
       done(err);
@@ -57,7 +59,7 @@ describe('Workflow - Linear Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output' });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}}});
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
     expect(events.results('activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
     expect(events.results('activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
