@@ -1,6 +1,6 @@
 {
   "name": "usher",
-  "version": "0.3.0-beta.4",
+  "version": "0.3.0",
   "dependencies": {
     "aws-swf": {
       "version": "4.1.0",
