@@ -26,6 +26,12 @@ var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workf
   })
   .activity('activity6', '*', function (task) {
     task.success({ activity6: 'Activity 6 output' });
+  })
+  .activity('failure1', '*', function (task) {
+    task.failed('Failure', new Error(), false);
+  })
+  .activity('timeout1', '*', function () {
+    // do nothing, let us timeout
   });
 
 function start() {

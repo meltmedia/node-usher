@@ -26,6 +26,9 @@ loopWorkflow
     // child1 workflow will execute once activity1 is complete
     .loop('loop1', ['activity1'], loopBranch, function (input) {
       return _.map(input.activity1, function (item) { return item.id; });
+    }, {
+      batchDelay: 1, // delay 1 second per batch
+      itemsPerBatch: 1 // process only 1 item per batch
     })
 
     // activity2 will execute once child1 workflow is complete

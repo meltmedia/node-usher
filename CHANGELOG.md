@@ -39,3 +39,8 @@
 + Expanding scope of Usher to include the ability to manage Activities as well as Deciders
 + Full version support for Activities and Deciders using [semver](http://semver.org/) v2.0
   + This means that deciders / activities can be configured to match explicit or ranges of versions (think NPM module versions)
+
+## 0.3.1 (Jan 6, 2015)
+
++ Implemented configurable batch scheduling logic for loops. Defaults to processing `20` items per batch with a `1` second Timer scheduled between batches. This is designed to mitigate `CHILD_CREATION_RATE_EXCEEDED` and `ACTIVITY_CREATION_RATE_EXCEEDED` exceptions seen in larger workflows.
++ Better handling of failure states in `loop` decisions.

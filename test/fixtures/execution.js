@@ -21,15 +21,23 @@ function execute(name, version, input, cb) {
     'executionStartToCloseTimeout': '10',
     'taskStartToCloseTimeout': '10',
     'childPolicy': 'TERMINATE'
-  }, new AWS.SimpleWorkflow());
-
-  var workflowExecution = workflow.start({ input: JSON.stringify(input) }, function (err, id) {
-    if (err) {
-      return cb(err);
+  }, new AWS.SimpleWorkflow({
+    httpOptions: {
+     timeout: 5000
     }
+  }));
 
-    checkStatus(id, workflowExecution.workflowId, cb);
-  });
+  setTimeout(function () {
+    winston.log('debug', 'Starting workflow: %s', name);
+    var workflowExecution = workflow.start({ input: JSON.stringify(input) }, function (err, id) {
+      if (err) {
+        return cb(err);
+      }
+
+      winston.log('debug', 'Started workflow: %s with execution id: %s', name, id);
+      checkStatus(id, workflowExecution.workflowId, cb);
+    });
+  }, 2000);
 }
 
 
