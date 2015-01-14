@@ -3,7 +3,8 @@ var chai = require('chai'),
     fixtures = require('./fixtures'),
     usher = require('../lib/usher');
 
-describe('Workflow - Loop Execution wo/ Batch', function () {
+
+describe('Workflow - Loop Execution w/ Batch', function () {
 
   this.timeout(71000);
 
@@ -11,7 +12,7 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
 
   before(function (done) {
     fragment = usher
-      .fragment('loop-fragment-workflow')
+      .fragment('loop-batch-fragment-workflow')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
@@ -19,7 +20,7 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
         .activity('activity4', ['activity3']);
 
     loopWorkflow = usher
-      .workflow('loop', '_test_workflow_', { taskList: 'test-loop-decision-tasklist' });
+      .workflow('loop-batch', '_test_workflow_', { taskList: 'test-loop-batch-decision-tasklist' });
 
     loopWorkflow
       .version('1.0.0')
@@ -31,13 +32,13 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
           return ['test1', 'test2', 'test3'];
         }, {
           batchDelay: 1,
-          itemsPerBatch: 3
+          itemsPerBatch: 1
         })
         .activity('activity2', ['loop1']);
 
     loopWorkflow.start();
 
-    fixtures.execution.execute('loop', '1.0.0', { input: 'test input' }, function (err, s, e) {
+    fixtures.execution.execute('loop-batch', '1.0.0', { input: 'test input' }, function (err, s, e) {
       status = s;
       events = e;
       done(err);

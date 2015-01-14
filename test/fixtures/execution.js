@@ -18,8 +18,8 @@ function execute(name, version, input, cb) {
       'version': version
     },
     'taskList': { name: 'test-' + name + '-decision-tasklist' },
-    'executionStartToCloseTimeout': '10',
-    'taskStartToCloseTimeout': '10',
+    'executionStartToCloseTimeout': '20',
+    'taskStartToCloseTimeout': '20',
     'childPolicy': 'TERMINATE'
   }, new AWS.SimpleWorkflow({
     httpOptions: {

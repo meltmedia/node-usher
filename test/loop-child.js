@@ -3,23 +3,32 @@ var chai = require('chai'),
     fixtures = require('./fixtures'),
     usher = require('../lib/usher');
 
-describe('Workflow - Loop Execution wo/ Batch', function () {
+
+describe('Workflow - Loop Execution w/ Child', function () {
 
   this.timeout(71000);
 
-  var loopWorkflow, fragment, status, events;
+  var loopWorkflow, childWorkflow, fragment, status, events;
 
   before(function (done) {
-    fragment = usher
-      .fragment('loop-fragment-workflow')
+
+    childWorkflow = usher
+      .workflow('child', '_test_workflow_', { taskList: 'test-child-decision-tasklist' });
+
+    childWorkflow
+      .version('1.0.0')
         .activityDefaults({
           taskList: 'test-workflow-activity-tasklist'
         })
         .activity('activity3')
         .activity('activity4', ['activity3']);
 
+    fragment = usher
+      .fragment('loop-child-fragment-workflow')
+        .child('child-loop', 'child', '1.0.0');
+
     loopWorkflow = usher
-      .workflow('loop', '_test_workflow_', { taskList: 'test-loop-decision-tasklist' });
+      .workflow('loop-child', '_test_workflow_', { taskList: 'test-loop-child-decision-tasklist' });
 
     loopWorkflow
       .version('1.0.0')
@@ -31,13 +40,14 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
           return ['test1', 'test2', 'test3'];
         }, {
           batchDelay: 1,
-          itemsPerBatch: 3
+          itemsPerBatch: 1
         })
         .activity('activity2', ['loop1']);
 
     loopWorkflow.start();
+    childWorkflow.start();
 
-    fixtures.execution.execute('loop', '1.0.0', { input: 'test input' }, function (err, s, e) {
+    fixtures.execution.execute('loop-child', '1.0.0', { input: 'test input' }, function (err, s, e) {
       status = s;
       events = e;
       done(err);
@@ -46,6 +56,7 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
 
   after(function () {
     loopWorkflow.stop();
+    childWorkflow.stop();
   });
 
   it('should execute a looping workflow successfuly', function () {
@@ -61,12 +72,9 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
 
   it('should verify all activities returned expected results', function () {
     expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
-    expect(events.results('loop1-0-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
-    expect(events.results('loop1-0-activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
-    expect(events.results('loop1-1-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
-    expect(events.results('loop1-1-activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
-    expect(events.results('loop1-2-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
-    expect(events.results('loop1-2-activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
+    expect(events.childworkflow_completed('loop1-0-child-loop')).to.be.true;
+    expect(events.childworkflow_completed('loop1-1-child-loop')).to.be.true;
+    expect(events.childworkflow_completed('loop1-2-child-loop')).to.be.true;
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
   });
 

@@ -44,3 +44,8 @@
 
 + Implemented configurable batch scheduling logic for loops. Defaults to processing `20` items per batch with a `1` second Timer scheduled between batches. This is designed to mitigate `CHILD_CREATION_RATE_EXCEEDED` and `ACTIVITY_CREATION_RATE_EXCEEDED` exceptions seen in larger workflows.
 + Better handling of failure states in `loop` decisions.
+
+## 0.3.2 (Jan 14, 2015)
+
++ Adding Marker event recording the current decider state when a decision can't be made.
++ Additional test cases for loops
