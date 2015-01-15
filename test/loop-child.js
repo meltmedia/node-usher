@@ -37,10 +37,10 @@ describe('Workflow - Loop Execution w/ Child', function () {
         })
         .activity('activity1')
         .loop('loop1', ['activity1'], fragment, function () {
-          return ['test1', 'test2', 'test3'];
+          return ['test1', 'test2'];
         }, {
           batchDelay: 1,
-          itemsPerBatch: 1
+          itemsPerBatch: 2
         })
         .activity('activity2', ['loop1']);
 
@@ -74,7 +74,6 @@ describe('Workflow - Loop Execution w/ Child', function () {
     expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
     expect(events.childworkflow_completed('loop1-0-child-loop')).to.be.true;
     expect(events.childworkflow_completed('loop1-1-child-loop')).to.be.true;
-    expect(events.childworkflow_completed('loop1-2-child-loop')).to.be.true;
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
   });
 
