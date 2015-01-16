@@ -49,3 +49,7 @@
 
 + Adding Marker event recording the current decider state when a decision can't be made.
 + Additional test cases for loops
+
+## 0.3.3 (Jan 16, 2015)
+
++ Added additional debug logging
