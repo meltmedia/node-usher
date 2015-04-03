@@ -53,3 +53,7 @@
 ## 0.3.3 (Jan 16, 2015)
 
 + Added additional debug logging
+
+## 0.4.0 (Apr 3, 2015)
+
++ Added `whileLoop` decision type: loop over a fragment until a done condition is met

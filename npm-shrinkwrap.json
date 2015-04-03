@@ -1,6 +1,6 @@
 {
   "name": "usher",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "dependencies": {
     "aws-swf": {
       "version": "4.1.0",
@@ -30,6 +30,11 @@
               "resolved": "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-0.4.2.tgz"
             }
           }
+        },
+        "lodash": {
+          "version": "2.4.1",
+          "from": "lodash@~2.4.1",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz"
         }
       }
     },
@@ -51,9 +56,9 @@
       "resolved": "https://registry.npmjs.org/gonfalon/-/gonfalon-0.1.0.tgz"
     },
     "lodash": {
-      "version": "2.4.1",
+      "version": "3.6.0",
       "from": "lodash@*",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz"
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.6.0.tgz"
     },
     "orchestrator": {
       "version": "0.3.7",
@@ -92,9 +97,9 @@
       }
     },
     "semver": {
-      "version": "4.2.0",
+      "version": "4.3.3",
       "from": "semver@*",
-      "resolved": "https://registry.npmjs.org/semver/-/semver-4.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.3.tgz"
     },
     "sequencify": {
       "version": "1.0.0",

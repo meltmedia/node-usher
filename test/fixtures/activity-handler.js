@@ -7,6 +7,8 @@ module.exports = {
   stop: stop
 };
 
+var whileCount = 0,
+    whileMaxCount = 2;
 
 var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workflow-activity-tasklist' })
   .activity('activity1', '*', function (task) {
@@ -32,6 +34,10 @@ var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workf
   })
   .activity('timeout1', '*', function () {
     // do nothing, let us timeout
+  })
+  .activity('while-activity1', '*', function (task) {
+    whileCount++;
+    task.success({ done: whileCount > whileMaxCount });
   });
 
 function start() {
