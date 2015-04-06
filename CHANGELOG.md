@@ -57,3 +57,7 @@
 ## 0.4.0 (Apr 3, 2015)
 
 + Added `whileLoop` decision type: loop over a fragment until a done condition is met
+
+## 0.4.1 (Apr 5, 2015)
+
++ Support for nesting loops within each other. Nesting should be shallow (Ideally < 3 levels deep).
