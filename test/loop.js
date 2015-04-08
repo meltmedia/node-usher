@@ -60,7 +60,7 @@ describe('Workflow - Loop Execution wo/ Batch', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
     expect(events.results('loop1-0-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
     expect(events.results('loop1-0-activity4')).to.deep.equal({ activity4: 'Activity 4 output' });
     expect(events.results('loop1-1-activity3')).to.deep.equal({ activity3: 'Activity 3 output' });

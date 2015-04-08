@@ -67,7 +67,7 @@ describe('Workflow - Branch Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
     expect(events.results('activity3')).to.deep.equal({ activity3: 'Activity 3 output' });
   });

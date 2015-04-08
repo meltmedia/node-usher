@@ -61,3 +61,8 @@
 ## 0.4.1 (Apr 5, 2015)
 
 + Support for nesting loops within each other. Nesting should be shallow (Ideally < 3 levels deep).
+
+## 0.5.0 (Apr 8, 2015)
+
++ Adding `variable` decision type: allows storing values for future activities to use.
++ Resolved async bug in `loop` decisions where the state of the loop could have been evaluated before all task had completed.

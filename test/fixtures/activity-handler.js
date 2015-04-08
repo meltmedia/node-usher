@@ -38,12 +38,24 @@ var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workf
   })
   .activity('while-activity1', '*', function (task) {
     whileCount1++;
-    task.success({ done: whileCount1 > whileMaxCount });
+    task.success({
+      done: whileCount1 > whileMaxCount,
+      _state: task.input._input._state
+    });
   })
   .activity('while-activity2', '*', function (task) {
     whileCount2++;
     var items = whileCount2 > whileMaxCount ? [] : ['item1', 'item2', 'item3'];
     task.success(items);
+  })
+  .activity('variable-activity1', '*', function (task) {
+    task.success(task.input._variables);
+  })
+  .activity('variable-activity2', '*', function (task) {
+    task.success(task.input._variables);
+  })
+  .activity('variable-activity3', '*', function (task) {
+    task.success(task.input._variables);
   });
 
 function start() {

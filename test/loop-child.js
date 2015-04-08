@@ -71,7 +71,7 @@ describe('Workflow - Loop Execution w/ Child', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
     expect(events.childworkflow_completed('loop1-0-child-loop')).to.be.true;
     expect(events.childworkflow_completed('loop1-1-child-loop')).to.be.true;
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });

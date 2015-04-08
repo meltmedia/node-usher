@@ -56,10 +56,10 @@ describe('Workflow - While Loop Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
     expect(events.results('while1-0-while-activity1')).to.deep.equal({ done: false });
-    expect(events.results('while1-1-while-activity1')).to.deep.equal({ done: false });
-    expect(events.results('while1-2-while-activity1')).to.deep.equal({ done: true });
+    expect(events.results('while1-1-while-activity1')).to.deep.equal({ done: false, _state: { currentIndex: 1 }});
+    expect(events.results('while1-2-while-activity1')).to.deep.equal({ done: true, _state: { currentIndex: 2 }});
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
   });
 

@@ -67,7 +67,7 @@ describe('Workflow - Nested While Loop Execution', function () {
   });
 
   it('should verify all activities returned expected results', function () {
-    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}} });
+    expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
 
     var items = ['item1', 'item2', 'item3'],
         activity3Result = { activity3: 'Activity 3 output' };
