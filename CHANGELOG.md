@@ -66,3 +66,7 @@
 
 + Adding `variable` decision type: allows storing values for future activities to use.
 + Resolved async bug in `loop` decisions where the state of the loop could have been evaluated before all task had completed.
+
+## 0.5.1 (Apr 9, 2015)
+
++ Adding `ignoreFailures` option to child workflow task
