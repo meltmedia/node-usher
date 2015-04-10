@@ -70,3 +70,8 @@
 ## 0.5.1 (Apr 9, 2015)
 
 + Adding `ignoreFailures` option to child workflow task
+
+## 0.5.2 / 0.5.3 (Apr 9, 2015)
+
++ Resolved issue when using batches in long loops
++ Updated aws-sdk to latest version
