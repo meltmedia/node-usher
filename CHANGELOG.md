@@ -75,3 +75,7 @@
 
 + Resolved issue when using batches in long loops
 + Updated aws-sdk to latest version
+
+## 0.5.4 (Apr 13, 2015)
+
++ Resolved a potential race condition in workflow execution
