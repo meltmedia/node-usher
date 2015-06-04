@@ -79,3 +79,8 @@
 ## 0.5.4 (Apr 13, 2015)
 
 + Resolved a potential race condition in workflow execution
+
+## 0.6.0 (Jun 4, 2015)
+
++ Adding `register` method to both activities and workflows
++ Updated dependencies to latest versions
