@@ -84,3 +84,7 @@
 
 + Adding `register` method to both activities and workflows
 + Updated dependencies to latest versions
+
+## 0.6.1 (July 7, 2015)
+
++ Fixing `undefined` error when starting and stopping pollers quickly, such as in unit tests
