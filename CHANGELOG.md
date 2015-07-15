@@ -88,3 +88,7 @@
 ## 0.6.1 (July 7, 2015)
 
 + Fixing `undefined` error when starting and stopping pollers quickly, such as in unit tests
+
+## 0.6.2 (July 14, 2015)
+
++ Allowing access to the raw `context` in transform and variable tasks
