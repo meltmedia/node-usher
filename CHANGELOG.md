@@ -92,3 +92,7 @@
 ## 0.6.2 (July 14, 2015)
 
 + Allowing access to the raw `context` in transform and variable tasks
+
+## 0.6.3 (Sept 21, 2015)
+
++ Updated dependencies to latest versions to resolve a race condition when using loops

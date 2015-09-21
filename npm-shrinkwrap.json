@@ -3,9 +3,9 @@
   "version": "0.6.2",
   "dependencies": {
     "async": {
-      "version": "1.2.0",
+      "version": "1.4.2",
       "from": "async@*",
-      "resolved": "https://registry.npmjs.org/async/-/async-1.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/async/-/async-1.4.2.tgz"
     },
     "aws-swf": {
       "version": "4.1.0",
@@ -14,7 +14,7 @@
       "dependencies": {
         "aws-sdk": {
           "version": "2.0.31",
-          "from": "aws-sdk@~2.0.7",
+          "from": "aws-sdk@>=2.0.7 <2.1.0",
           "resolved": "https://registry.npmjs.org/aws-sdk/-/aws-sdk-2.0.31.tgz",
           "dependencies": {
             "xml2js": {
@@ -38,7 +38,7 @@
         },
         "lodash": {
           "version": "2.4.2",
-          "from": "lodash@~2.4.1",
+          "from": "lodash@>=2.4.1 <2.5.0",
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.2.tgz"
         }
       }
@@ -50,7 +50,7 @@
       "dependencies": {
         "precond": {
           "version": "0.2.3",
-          "from": "precond@0.2",
+          "from": "precond@>=0.2.0 <0.3.0",
           "resolved": "https://registry.npmjs.org/precond/-/precond-0.2.3.tgz"
         }
       }
@@ -61,9 +61,9 @@
       "resolved": "https://registry.npmjs.org/gonfalon/-/gonfalon-0.1.0.tgz"
     },
     "lodash": {
-      "version": "3.9.3",
+      "version": "3.10.1",
       "from": "lodash@*",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.9.3.tgz"
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
     "orchestrator": {
       "version": "0.3.7",
@@ -72,17 +72,17 @@
       "dependencies": {
         "end-of-stream": {
           "version": "0.1.5",
-          "from": "end-of-stream@~0.1.5",
+          "from": "end-of-stream@>=0.1.5 <0.2.0",
           "resolved": "https://registry.npmjs.org/end-of-stream/-/end-of-stream-0.1.5.tgz",
           "dependencies": {
             "once": {
               "version": "1.3.2",
-              "from": "once@~1.3.0",
+              "from": "once@>=1.3.0 <1.4.0",
               "resolved": "https://registry.npmjs.org/once/-/once-1.3.2.tgz",
               "dependencies": {
                 "wrappy": {
                   "version": "1.0.1",
-                  "from": "wrappy@1",
+                  "from": "wrappy@>=1.0.0 <2.0.0",
                   "resolved": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.1.tgz"
                 }
               }
@@ -91,24 +91,24 @@
         },
         "sequencify": {
           "version": "0.0.7",
-          "from": "sequencify@~0.0.7",
+          "from": "sequencify@>=0.0.7 <0.1.0",
           "resolved": "https://registry.npmjs.org/sequencify/-/sequencify-0.0.7.tgz"
         },
         "stream-consume": {
           "version": "0.1.0",
-          "from": "stream-consume@~0.1.0",
+          "from": "stream-consume@>=0.1.0 <0.2.0",
           "resolved": "https://registry.npmjs.org/stream-consume/-/stream-consume-0.1.0.tgz"
         }
       }
     },
     "semver": {
-      "version": "4.3.6",
+      "version": "5.0.3",
       "from": "semver@*",
-      "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.6.tgz"
+      "resolved": "https://registry.npmjs.org/semver/-/semver-5.0.3.tgz"
     },
     "sequencify": {
       "version": "1.0.0",
-      "from": "sequencify@git://github.com/robrich/sequencify.git",
+      "from": "git://github.com/robrich/sequencify.git",
       "resolved": "git://github.com/robrich/sequencify.git#1c66e1cda4b08f78814752eeca9296fed0435212"
     }
   }
