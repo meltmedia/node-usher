@@ -96,3 +96,7 @@
 ## 0.6.3 (Sept 21, 2015)
 
 + Updated dependencies to latest versions to resolve a race condition when using loops
+
+## 0.6.4 (Nov 5, 2015)
+
++ Added `execute` method to Workflow as a utility method for finding the correct version and starting a workflow execution

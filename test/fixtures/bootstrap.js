@@ -20,6 +20,7 @@ function setup() {
     .then(registerWorkflow(domain, 'parent-failure'))
     .then(registerWorkflow(domain, 'child-failure'))
     .then(registerWorkflow(domain, 'linear'))
+    .then(registerWorkflow(domain, 'execution-test'))
     .then(registerWorkflow(domain, 'loop'))
     .then(registerWorkflow(domain, 'loop-batch'))
     .then(registerWorkflow(domain, 'loop-failure'))
