@@ -100,3 +100,9 @@
 ## 0.6.4 (Nov 5, 2015)
 
 + Added `execute` method to Workflow as a utility method for finding the correct version and starting a workflow execution
+
+## 0.6.5 (Nov 9, 2015)
+
++ Added support for tags in `execute` method
++ Updated default timeouts for `execute` method
++ Variable tasks will no longer set a marker if the value did not change

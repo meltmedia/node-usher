@@ -23,7 +23,7 @@ describe('Workflow - Execution', function () {
 
     linearWorkflow.start();
 
-    linearWorkflow.execute({ input: 'test input' }, '1.0.0', function (err, r, w) {
+    linearWorkflow.execute({ input: 'test input' }, '1.0.0', ['tag1:tagValue1'], function (err, r, w) {
       runId = r;
       workflowId = w;
       setTimeout(function () {
