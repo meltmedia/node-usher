@@ -106,3 +106,7 @@
 + Added support for tags in `execute` method
 + Updated default timeouts for `execute` method
 + Variable tasks will no longer set a marker if the value did not change
+
+## 0.6.6 (Nov 9, 2015)
+
++ Resolved an issue when using a function in a tagList
