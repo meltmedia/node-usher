@@ -110,3 +110,8 @@
 ## 0.6.6 (Nov 9, 2015)
 
 + Resolved an issue when using a function in a tagList
+
+## 0.6.7 (Nov 19, 2015)
+
++ Resolved an issue where calling execute on a workflow would not work
++ Pass through default options when executing workflows
