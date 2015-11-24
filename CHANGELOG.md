@@ -115,3 +115,7 @@
 
 + Resolved an issue where calling execute on a workflow would not work
 + Pass through default options when executing workflows
+
+## 0.7.0 (Nov 24, 2015)
+
++ Removing NPM shrinkwrap from module as best practices are to not include with libs

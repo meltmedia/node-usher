@@ -99,10 +99,10 @@ function registerActivity(domain, name, version, tasklist) {
       name: name,
       version: version || '1.0.0',
       defaultTaskList: { name: tasklist || 'test-workflow-activity-tasklist' },
-      defaultTaskHeartbeatTimeout: '30',
-      defaultTaskScheduleToCloseTimeout: '30',
+      defaultTaskHeartbeatTimeout: 'NONE',
+      defaultTaskScheduleToCloseTimeout: '90',
       defaultTaskScheduleToStartTimeout: '30',
-      defaultTaskStartToCloseTimeout: '30'
+      defaultTaskStartToCloseTimeout: '60'
     },
     function (err, results) {
       if (err) {

@@ -1,6 +1,6 @@
 {
   "name" : "usher",
-  "version" : "0.6.7",
+  "version" : "0.7.0",
   "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
   "author" : "Mike Moulton <mike@meltmedia.com>",
   "main" : "index.js",
@@ -37,6 +37,7 @@
     "q": "*",
     "gulp": "*",
     "gulp-jshint": "*",
+    "jshint": "*",
     "gulp-jsdoc": "*",
     "gulp-mocha": "*",
     "jshint-stylish": "*",
