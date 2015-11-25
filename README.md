@@ -72,7 +72,7 @@ var usher = require('usher');
 // This assumes the workflow 'linerar-workflow' has already been defined previously
 var workflow = usher.workflow('linear-workflow', 'my-domain-name');
 
-workflow.execute({ key: 'value '}, function (err, runId, workflowId) {
+workflow.execute({ key: 'value '}, '1.0.0', function (err, runId, workflowId) {
   // once the workflow has started
 });
 ```

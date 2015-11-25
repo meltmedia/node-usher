@@ -119,3 +119,7 @@
 ## 0.7.0 (Nov 24, 2015)
 
 + Removing NPM shrinkwrap from module as best practices are to not include with libs
+
+## 0.7.1 (Nov 24, 2015)
+
++ Adding defaults for `scheduleToStartTimeout`, `scheduleToCloseTimeout`, `startToCloseTimeout`, and `heartbeatTimeout`
