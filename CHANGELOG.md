@@ -123,3 +123,9 @@
 ## 0.7.1 (Nov 24, 2015)
 
 + Adding defaults for `scheduleToStartTimeout`, `scheduleToCloseTimeout`, `startToCloseTimeout`, and `heartbeatTimeout`
+
+## 0.8.0 (Feb 10, 2016)
+
++ Added `accumulator` decision type: accumulate the results of iterations of a fragment
++ Expand `Context.didChildWorkflowFail` to include timeout events
++ Added support for `maxOutstanding` flag on `loop` decisions

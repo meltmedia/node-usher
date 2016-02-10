@@ -9,7 +9,9 @@ module.exports = {
 
 var whileCount1 = 0,
     whileCount2 = 0,
-    whileMaxCount = 2;
+    whileMaxCount = 2,
+    accumulatorCount = 0,
+    accumulatorMaxCount = 6;
 
 var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workflow-activity-tasklist' })
   .activity('activity1', '*', function (task) {
@@ -47,6 +49,14 @@ var poller = usher.activities('test', '_test_workflow_', { taskList: 'test-workf
     whileCount2++;
     var items = whileCount2 > whileMaxCount ? [] : ['item1', 'item2', 'item3'];
     task.success(items);
+  })
+  .activity('accumulator-activity1', '*', function (task) {
+    accumulatorCount++;
+    var items = accumulatorCount > accumulatorMaxCount ? [] : ['item1-' + accumulatorCount, 'item2-' + accumulatorCount, 'item3-' + accumulatorCount];
+    task.success(items);
+  })
+  .activity('accumulator-results', '*', function (task) {
+    task.success(task.input);
   })
   .activity('variable-activity1', '*', function (task) {
     task.success(task.input._variables);
