@@ -129,3 +129,7 @@
 + Added `accumulator` decision type: accumulate the results of iterations of a fragment
 + Expand `Context.didChildWorkflowFail` to include timeout events
 + Added support for `maxOutstanding` flag on `loop` decisions
+
+## 0.8.1 (Feb 10, 2016)
+
++ Expand `Context.didActivityFail` to include timeout events
