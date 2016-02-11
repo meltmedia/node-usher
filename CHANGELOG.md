@@ -134,6 +134,10 @@
 
 + Expand `Context.didActivityFail` to include timeout events
 
-## 0.8.2 (Feb 10, 2016)
+## 0.8.2 (Feb 11, 2016)
 
 + Lodash 4.x compatibility changes
+
+## 0.8.3 (Feb 11, 2016)
+
++ Cleanup some debug logging
