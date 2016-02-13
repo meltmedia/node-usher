@@ -17,6 +17,8 @@ function setup() {
     .then(registerWorkflow(domain, 'branch'))
     .then(registerWorkflow(domain, 'parent'))
     .then(registerWorkflow(domain, 'child'))
+    .then(registerWorkflow(domain, 'parent-result'))
+    .then(registerWorkflow(domain, 'child-result'))
     .then(registerWorkflow(domain, 'parent-failure'))
     .then(registerWorkflow(domain, 'child-failure'))
     .then(registerWorkflow(domain, 'linear'))

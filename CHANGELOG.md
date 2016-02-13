@@ -141,3 +141,8 @@
 ## 0.8.3 (Feb 11, 2016)
 
 + Cleanup some debug logging
+
+## 0.8.4 (Feb 12, 2016)
+
++ Added `result` decision type so you can customize the output of a workflow.
++ Added `previousResult` variable to `accumulator` fragment input so patterns such as paging can be implemented.
