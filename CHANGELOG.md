@@ -146,3 +146,7 @@
 
 + Added `result` decision type so you can customize the output of a workflow.
 + Added `previousResult` variable to `accumulator` fragment input so patterns such as paging can be implemented.
+
+## 0.8.5 (Feb 14, 2016)
+
++ Minor change to how variables are recorded in markers.
