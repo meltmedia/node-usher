@@ -1,6 +1,6 @@
 {
   "name" : "usher",
-  "version" : "0.8.5",
+  "version" : "0.9.0",
   "description" : "Simple DSL for composing decision workflows for AWS Simple Workflow",
   "author" : "Mike Moulton <mike@meltmedia.com>",
   "main" : "index.js",
@@ -23,7 +23,6 @@
     "async": "*",
     "aws-swf": "*",
     "lodash": "*",
-    "orchestrator": "*",
     "gonfalon": "*",
     "backoff": "*",
     "semver": "*",

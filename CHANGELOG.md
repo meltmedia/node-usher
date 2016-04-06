@@ -150,3 +150,8 @@
 ## 0.8.5 (Feb 14, 2016)
 
 + Minor change to how variables are recorded in markers.
+
+## 0.9.0 (Apr 6, 2016)
+
++ Performance increases for large workflows
++ Partial migration away from `aws-swf` library
