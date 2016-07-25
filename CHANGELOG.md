@@ -155,3 +155,7 @@
 
 + Performance increases for large workflows
 + Partial migration away from `aws-swf` library
+
+## 0.10.0 (July 25, 2016)
+
++ Support for heartbeats on long running activities

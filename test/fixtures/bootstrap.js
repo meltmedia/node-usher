@@ -14,6 +14,7 @@ function setup() {
   var domain = '_test_workflow_';
   registerDomain(domain)
     .then(registerWorkflow(domain, 'activity'))
+    .then(registerWorkflow(domain, 'heartbeat-activity'))
     .then(registerWorkflow(domain, 'branch'))
     .then(registerWorkflow(domain, 'parent'))
     .then(registerWorkflow(domain, 'child'))
@@ -46,6 +47,7 @@ function setup() {
     .then(registerActivity(domain, 'variable-activity1'))
     .then(registerActivity(domain, 'variable-activity2'))
     .then(registerActivity(domain, 'variable-activity3'))
+    .then(registerActivity(domain, 'test-long-activity1', '1.0.0', 'test-heartbeat-activity-poller-tasklist'))
     .then(registerActivity(domain, 'test-activity1', '1.0.0', 'test-activity-poller-tasklist'))
     .then(registerActivity(domain, 'test-activity1', '1.1.0', 'test-activity-poller-tasklist'))
     .then(registerActivity(domain, 'test-activity2', '1.0.0', 'test-activity-poller-tasklist'))
@@ -104,7 +106,7 @@ function registerActivity(domain, name, version, tasklist) {
       name: name,
       version: version || '1.0.0',
       defaultTaskList: { name: tasklist || 'test-workflow-activity-tasklist' },
-      defaultTaskHeartbeatTimeout: 'NONE',
+      defaultTaskHeartbeatTimeout: '30',
       defaultTaskScheduleToCloseTimeout: '90',
       defaultTaskScheduleToStartTimeout: '30',
       defaultTaskStartToCloseTimeout: '60'
