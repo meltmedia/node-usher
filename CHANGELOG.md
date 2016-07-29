@@ -159,3 +159,7 @@
 ## 0.10.0 (July 25, 2016)
 
 + Support for heartbeats on long running activities
+
+## 0.10.1 (July 29, 2016)
+
++ Support for dynamic activity execution in a decider
