@@ -15,6 +15,7 @@ function setup() {
   registerDomain(domain)
     .then(registerWorkflow(domain, 'activity'))
     .then(registerWorkflow(domain, 'heartbeat-activity'))
+    .then(registerWorkflow(domain, 'dynamic'))
     .then(registerWorkflow(domain, 'branch'))
     .then(registerWorkflow(domain, 'parent'))
     .then(registerWorkflow(domain, 'child'))

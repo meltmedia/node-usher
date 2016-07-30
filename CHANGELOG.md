@@ -163,3 +163,7 @@
 ## 0.10.1 (July 29, 2016)
 
 + Support for dynamic activity execution in a decider
+
+## 0.10.2 (July 29, 2016)
+
++ Exposing raw, un-transformed input to options like 'taskList', 'activityType', etc.
