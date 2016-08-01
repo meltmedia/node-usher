@@ -36,7 +36,10 @@ describe('Workflow - Child Execution', function () {
           taskList: 'test-workflow-activity-tasklist'
         })
         .activity('activity3')
-        .activity('activity4', ['activity3']);
+        .activity('activity4', ['activity3'])
+        .result('result', ['activity3', 'activity4'], function (input) {
+          return input;
+        });
 
     parentWorkflow.start();
     childWorkflow.start();
@@ -67,7 +70,29 @@ describe('Workflow - Child Execution', function () {
 
   it('should verify all activities returned expected results', function () {
     expect(events.results('activity1')).to.deep.equal({ activity1: 'Activity 1 output', input: { _input: { input: 'test input'}, _variables: {}} });
-    expect(events.childworkflow_results('child1')).to.deep.equal({"activity3":{"activity3":"Activity 3 output"},"activity4":{"activity4":"Activity 4 output"}});
+
+    var output = {
+      "_input": {
+        "_input": {
+          "input": "test input"
+        },
+        "_variables": {},
+        "activity1": {
+          "activity1": "Activity 1 output",
+          "input": {
+            "_input": {
+              "input": "test input"
+            },
+            "_variables": {}
+          }
+        }
+      },
+      "_variables":{},
+      "activity3":{"activity3":"Activity 3 output"},
+      "activity4":{"activity4":"Activity 4 output"}
+    };
+    expect(events.childworkflow_results('child1')).to.deep.equal(output);
+
     expect(events.results('activity2')).to.deep.equal({ activity2: 'Activity 2 output' });
   });
 

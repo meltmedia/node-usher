@@ -167,3 +167,8 @@
 ## 0.10.2 (July 29, 2016)
 
 + Exposing raw, un-transformed input to options like 'taskList', 'activityType', etc.
+
+## 0.10.3 (Aug 1, 2016)
+
++ Fixed regression in child workflow execution where they stopped getting input
++ Expanded test suite to ensure this does not happen again
