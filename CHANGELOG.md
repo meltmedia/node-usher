@@ -172,3 +172,7 @@
 
 + Fixed regression in child workflow execution where they stopped getting input
 + Expanded test suite to ensure this does not happen again
+
+## 0.10.4 (Aug 5, 2016)
+
++ Better handling of uncaught exceptions in activities
