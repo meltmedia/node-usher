@@ -177,6 +177,6 @@
 
 + Better handling of uncaught exceptions in activities
 
-## 0.10.5 (Aug 8, 2016)
+## 0.10.6 (Aug 8, 2016)
 
 + Support for dynamic child workflow execution in a decider
