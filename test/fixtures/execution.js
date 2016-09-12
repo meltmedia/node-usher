@@ -21,7 +21,7 @@ function execute(name, version, input, cb) {
     'executionStartToCloseTimeout': '120',
     'taskStartToCloseTimeout': '90',
     'childPolicy': 'TERMINATE'
-  }, new AWS.SimpleWorkflow({
+  }, new AWS.SWF({
     httpOptions: {
      timeout: 5000
     }
@@ -42,7 +42,7 @@ function execute(name, version, input, cb) {
 
 
 function checkStatus(runId, workflowId, cb) {
-  var client = new AWS.SimpleWorkflow();
+  var client = new AWS.SWF();
 
   client.describeWorkflowExecution({
       domain: '_test_workflow_',

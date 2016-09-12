@@ -1,82 +1,36 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Usher Source: decider/version.js</title>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: decider/version.js</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-	
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
 
 <body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top ">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">Usher</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="ActivityPoller.html">ActivityPoller</a>
-						</li>
-						
-						<li>
-							<a href="ActivityTask.html">ActivityTask</a>
-						</li>
-						
-						<li>
-							<a href="DecisionPoller.html">DecisionPoller</a>
-						</li>
-						
-						<li>
-							<a href="Fragment.html">Fragment</a>
-						</li>
-						
-						<li>
-							<a href="Usher.html">Usher</a>
-						</li>
-						
-						<li>
-							<a href="WorkflowVersion.html">WorkflowVersion</a>
-						</li>
-						
+<div id="main">
 
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
+    <h1 class="page-title">Source: decider/version.js</h1>
 
-	<div class="row-fluid">
-
-		
-			<div class="span12">
-				
-				<div id="main">
-					
+    
 
 
-		<h1 class="page-title">Source: decider/version.js</h1>
     
     <section>
         <article>
-            <pre class="sunlight-highlight-javascript linenums">/*!
+            <pre class="prettyprint source linenums"><code>/*!
  * Usher
  * Copyright(c) 2014 meltmedia &lt;mike@meltmedia.com>
  */
+
+/* jshint camelcase:false */
 
 'use strict';
 
@@ -85,10 +39,10 @@ var winston = require('winston'),
     _ = require('lodash'),
     swf = require('aws-swf'),
     AWS = require('aws-sdk'),
-    sequencify = require('sequencify'),
     usherUtil = require('../util'),
     Context = require('./context'),
     Fragment = require('./fragment'),
+    WorkflowState = require('./state'),
     WorkflowExecution = require('./execution');
 
 
@@ -129,17 +83,21 @@ util.inherits(WorkflowVersion, Fragment);
  * Execute a new run of this workflow
  * @returns {WorkflowVersion} This workflow so you can chain commands.
  */
-WorkflowVersion.prototype.execute = function execute(input, cb) {
+WorkflowVersion.prototype.execute = function execute(input, tags, cb) {
 
-  // Callback is optional
-  cb = cb || function () {};
+  // Callback and tags are optional
+  cb = cb || (_.isFunction(tags) ? tags : function () {});
+  tags = _.isFunction(tags) ? [] : (tags || []);
 
   var config = usherUtil.workflowConfig(this.name, this.version, input, this.options);
+
+  // Merge local tags with global tags
+  config.tagList = _.isArray(config.tagList) ? config.tagList.concat(tags) : tags;
 
   // The domain is not always needed so it's not set by the workflow config
   config.domain = this.domain;
 
-  var workflow = new swf.Workflow(config, new AWS.SimpleWorkflow());
+  var workflow = new swf.Workflow(config, new AWS.SWF());
   var workflowExecution = workflow.start({ input: JSON.stringify(input) }, function (err, runId) {
     if (err) {
       return cb(err);
@@ -156,153 +114,118 @@ WorkflowVersion.prototype.execute = function execute(input, cb) {
  * @returns {WorkflowVersion} This workflow version so you can chain commands.
  */
 WorkflowVersion.prototype.validate = function validate() {
-  // Map tasks into sequencify's input format
-  var names = [],
-      items = {};
+  // This will throw if there are issues
+  this.sequencedTasks();
 
-  _.each(this.tasks(), function (item) {
-    names.push(item.name);
-    items[item.name] = {
-      name: item.name,
-      dep: item.deps
-    };
-  });
-
-  var results = sequencify(items, names);
-
-  // Required dependencies not defined
-  if (!_.isEmpty(results.missingTasks)) {
-    throw new Error('The workflow is missing tasks: ' + JSON.stringify(results.missingTasks));
-  }
-
-  // Recursive dependencies found
-  if (!_.isEmpty(results.recursiveDependencies)) {
-    throw new Error('The workflow has recursive dependencies: ' + JSON.stringify(results.recursiveDependencies));
-  }
+  // If we got here, everything validated fine
+  return true;
 };
 
 
 /** @private */
 WorkflowVersion.prototype._handleTask = function _handleTask(decisionTask) {
-  var context,
+  var context, execution,
       self = this;
 
+  decisionTask.workflowState = new WorkflowState(decisionTask);
+
+  // When something goes wrong and we can't make a decision
+  function handleFailure(err) {
+    // Respond back to SWF failing the workflow
+    winston.log('error', 'An problem occured in the execution of workflow: %s, failing due to: ', self.name, err.stack);
+    decisionTask.response.fail('Workflow failed', err, function (err) {
+      if (err) {
+        winston.log('error', 'Unable to mark workflow: %s as failed due to: %s', self.name, JSON.stringify(err));
+        return;
+      }
+    });
+  }
+
+  // When we have made a decision
+  function handleSuccess() {
+
+    // If any activities failed, we need to fail the workflow
+    if (context.failed()) {
+      winston.log('warn', 'One of more activities failed in workflow: %s, marking workflow as failed', self.name);
+
+      // Respond back to SWF failing the workflow
+      decisionTask.response.fail('Activities failed', { failures: context.errorMessages }, function (err) {
+        if (err) {
+          winston.log('error', 'Unable to mark workflow: %s as failed due to: %s', self.name, JSON.stringify(err));
+          return;
+        }
+      });
+
+    } else {
+
+      // Check to see if we are done with the workflow
+      if (context.done()) {
+        winston.log('info', 'Workflow: %s has completed successfuly', self.name);
+
+        // Stop the workflow
+        decisionTask.response.stop({
+          result: JSON.stringify(context.results)
+        });
+      }
+
+      // If no decisions made this round, skip
+      if (!decisionTask.response.decisions) {
+        winston.log('debug', 'No decision can be made this round for workflow: %s', self.name);
+        // Record our state when we can't make a decision to help in debugging
+        // decisionTask.response.add_marker('current-state', JSON.stringify(context.currentStatus()));
+        decisionTask.response.wait();
+      }
+
+      // Respond back to SWF with all decisions
+      decisionTask.response.respondCompleted(decisionTask.response.decisions, function (err) {
+        if (err) {
+          winston.log('error', 'Unable to respond to workflow: %s with decisions due to: %s', self.name, JSON.stringify(err));
+          return;
+        }
+      });
+    }
+  }
+
+  /**
+   * Run Workflow
+   */
   winston.log('debug', 'Handling new decision task for workflow: %s', this.name);
 
   try {
-    var execution = new WorkflowExecution(this.tasks());
+    execution = new WorkflowExecution(this.sequencedTasks());
     context = new Context(decisionTask);
-    execution.execute(context);
+    execution.execute(context, function (err) {
+      if (err) {
+        return handleFailure(err);
+      }
+      handleSuccess();
+    });
+
   } catch (e) {
-    // Respond back to SWF failing the workflow
-    winston.log('error', 'An problem occured in the execution of workflow: %s, failing due to: ', this.name, e.stack);
-    decisionTask.response.fail('Workflow failed', e, function (err) {
-      if (err) {
-        winston.log('error', 'Unable to mark workflow: %s as failed due to: %s', self.name, JSON.stringify(err));
-        return;
-      }
-    });
-    return;
+    handleFailure(e);
   }
 
-  // If any activities failed, we need to fail the workflow
-  if (context.failWorkflow) {
-    winston.log('warn', 'One of more activities failed in workflow: %s, marking workflow as failed', this.name);
-
-    // Respond back to SWF failing the workflow
-    decisionTask.response.fail('Activities failed', context.errorMessages, function (err) {
-      if (err) {
-        winston.log('error', 'Unable to mark workflow: %s as failed due to: %s', self.name, JSON.stringify(err));
-        return;
-      }
-    });
-
-  } else {
-
-    // Check to see if we are done with the workflow
-    if (context.done()) {
-      winston.log('info', 'Workflow: %s has completed successfuly', this.name);
-
-      // Stop the workflow
-      decisionTask.response.stop({
-        result: JSON.stringify(context.results)
-      });
-    }
-
-    // If no decisions made this round, skip
-    if (!decisionTask.response.decisions) {
-      winston.log('debug', 'No decision can be made this round for workflow: %s', this.name);
-      decisionTask.response.wait();
-    }
-
-    // Respond back to SWF with all decisions
-    decisionTask.response.respondCompleted(decisionTask.response.decisions, function (err) {
-      if (err) {
-        winston.log('error', 'Unable to respond to workflow: %s with decisions due to: %s', self.name, JSON.stringify(err));
-        return;
-      }
-    });
-  }
 };
-</pre>
+</code></pre>
         </article>
     </section>
 
 
 
 
+</div>
 
-				</div>
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Accumulator.html">Accumulator</a></li><li><a href="ActivityPoller.html">ActivityPoller</a></li><li><a href="ActivityTask.html">ActivityTask</a></li><li><a href="DecisionPoller.html">DecisionPoller</a></li><li><a href="Fragment.html">Fragment</a></li><li><a href="Loop.html">Loop</a></li><li><a href="Usher.html">Usher</a></li><li><a href="WhileLoop.html">WhileLoop</a></li><li><a href="WorkflowVersion.html">WorkflowVersion</a></li></ul>
+</nav>
 
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		Copyright (C) 2014 meltmedia
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Tue Sep 23 2014 14:33:54 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
+<br clear="both">
 
-			
-			<br clear="both">
-		</div>
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Sep 12 2016 14:59:00 GMT-0700 (MST)
+</footer>
 
-	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
-
-
-	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
-
-	<script>
-		$( function () {
-			$( "#toc" ).toc( {
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : 60
-			} );
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-
-		} );
-	</script>
-
-	
-
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>

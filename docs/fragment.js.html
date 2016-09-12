@@ -1,79 +1,31 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Usher Source: decider/fragment.js</title>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: decider/fragment.js</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-	
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
 
 <body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top ">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">Usher</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="ActivityPoller.html">ActivityPoller</a>
-						</li>
-						
-						<li>
-							<a href="ActivityTask.html">ActivityTask</a>
-						</li>
-						
-						<li>
-							<a href="DecisionPoller.html">DecisionPoller</a>
-						</li>
-						
-						<li>
-							<a href="Fragment.html">Fragment</a>
-						</li>
-						
-						<li>
-							<a href="Usher.html">Usher</a>
-						</li>
-						
-						<li>
-							<a href="WorkflowVersion.html">WorkflowVersion</a>
-						</li>
-						
+<div id="main">
 
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
+    <h1 class="page-title">Source: decider/fragment.js</h1>
 
-	<div class="row-fluid">
-
-		
-			<div class="span12">
-				
-				<div id="main">
-					
+    
 
 
-		<h1 class="page-title">Source: decider/fragment.js</h1>
     
     <section>
         <article>
-            <pre class="sunlight-highlight-javascript linenums">/*!
+            <pre class="prettyprint source linenums"><code>/*!
  * Usher
  * Copyright(c) 2014 meltmedia &lt;mike@meltmedia.com>
  */
@@ -83,11 +35,16 @@
 var util = require('util'),
     events = require('events'),
     _ = require('lodash'),
+    sequencify = require('sequencify'),
     Activity = require('./tasks/activity'),
     ChildWorkflow = require('./tasks/child'),
     Loop = require('./tasks/loop'),
+    Accumulator = require('./tasks/accumulator'),
+    WhileLoop = require('./tasks/while-loop'),
     Decision = require('./tasks/decision'),
     Transform = require('./tasks/transform'),
+    Result = require('./tasks/result'),
+    Variable = require('./tasks/variable'),
     Terminate = require('./tasks/terminate');
 
 
@@ -116,6 +73,7 @@ function Fragment(name) {
 
   /** @private */
   this._tasks = [];
+  this._sequencedTasks = [];
 }
 
 
@@ -129,6 +87,49 @@ util.inherits(Fragment, events.EventEmitter);
  */
 Fragment.prototype.tasks = function tasks() {
   return this._tasks;
+};
+
+
+/**
+ * Get the defined tasks for the fragment in execution order
+ * @returns {Array} An array of defined tasks
+ */
+Fragment.prototype.sequencedTasks = function sequencedTasks() {
+  if (this._sequencedTasks &amp;&amp; this._sequencedTasks.length > 0) {
+    return this._sequencedTasks;
+  }
+
+  // Map tasks into sequencify's input format
+  var names = [],
+      items = {};
+
+  _.each(this.tasks(), function (item) {
+    names.push(item.name);
+    items[item.name] = {
+      name: item.name,
+      dep: item.deps,
+      task: item
+    };
+  });
+
+  var results = sequencify(items, names);
+
+  // Required dependencies not defined
+  if (!_.isEmpty(results.missingTasks)) {
+    throw new Error('The workflow is missing tasks: ' + JSON.stringify(results.missingTasks));
+  }
+
+  // Recursive dependencies found
+  if (!_.isEmpty(results.recursiveDependencies)) {
+    throw new Error('The workflow has recursive dependencies: ' + JSON.stringify(results.recursiveDependencies));
+  }
+
+  // Cache sequenced tasks
+  this._sequencedTasks = _.map(results.sequence, function (item) {
+    return items[item].task;
+  });
+
+  return this._sequencedTasks;
 };
 
 
@@ -165,6 +166,7 @@ Fragment.prototype.activity = function activity(name, deps, options) {
 
   var task = new Activity(name, deps, options);
   this._tasks.push(task); // Add the activity
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
@@ -191,30 +193,97 @@ Fragment.prototype.child = function child(name, deps, workflowName, workflowVers
 
   var task = new ChildWorkflow(name, deps, workflowName, workflowVersion, options);
   this._tasks.push(task); // Add the child workflow
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
 
 
 /**
- * Add an looping workflow execution to the workflow
- * @param {string} name - The unique name of the child workflow.
+ * Add a looping workflow execution to the workflow
+ *
+ * The loop executes in batches to help alleviate rate limit exceptions.
+ * The number of items to proccess per batch and the delay between batches are both configurable.
+ *
+ * @param {string} name - The unique name of the loop fragment.
  * @param {Array} [deps] - The names of the dependencies that must be met before this activity can execute.
  * @param {Fragment} fragment - The workflow fragment to loop over. Generated by `usher.fragment()`
  * @param {Function} loopFn - A function given the taks's input that returns an array. For every item in the Array an
  *                            execution of the `fragment` workflow will execute.
+ * @param {Object} [options] - Custom options for this activity. [itemsPerBatch, batchDelay]
  * @returns {Fragment} This workflow so you can chain commands.
  */
-Fragment.prototype.loop = function loop(name, deps, fragment, loopFn) {
-  if (!loopFn &amp;&amp; !_.isArray(deps)) {
+Fragment.prototype.loop = function loop(name, deps, fragment, loopFn, options) {
+  if (!options &amp;&amp; !_.isArray(deps)) {
+    options = loopFn;
     loopFn = fragment;
     fragment = deps;
     deps = undefined;
   }
   deps = deps || [];
 
-  var task = new Loop(name, deps, fragment, loopFn);
+  var task = new Loop(name, deps, fragment, loopFn, options);
   this._tasks.push(task); // Add the loop
+  this._sequencedTasks = null;
+
+  return this; // chainable
+};
+
+
+/**
+ * Add a while loop workflow execution to the workflow
+ *
+ * The loop executes until the `doneFn` returns a truthy value
+ *
+ * @param {string} name - The unique name of the while loop fragment.
+ * @param {Array} [deps] - The names of the dependencies that must be met before this activity can execute.
+ * @param {Fragment} fragment - The workflow fragment to loop over. Generated by `usher.fragment()`
+ * @param {Function} doneFn - Indicates when the loop is complete by returning a truthy value.
+ * @param {Object} [options] - Custom options for this activity.
+ * @returns {Fragment} This workflow so you can chain commands.
+ */
+Fragment.prototype.whileLoop = function whileLoop(name, deps, fragment, doneFn, options) {
+  if (!options &amp;&amp; !_.isArray(deps)) {
+    options = doneFn;
+    doneFn = fragment;
+    fragment = deps;
+    deps = undefined;
+  }
+  deps = deps || [];
+
+  var task = new WhileLoop(name, deps, fragment, doneFn, options);
+  this._tasks.push(task); // Add the while loop
+  this._sequencedTasks = null;
+
+  return this; // chainable
+};
+
+
+/**
+ * Add a accumulator execution to the workflow
+ *
+ * The accumulator executes a fragment until the `doneFn` returns a truthy value, taking the results
+ * of each iteration and making them available to any dependents
+ *
+ * @param {string} name - The unique name of the accumulator fragment.
+ * @param {Array} [deps] - The names of the dependencies that must be met before this activity can execute.
+ * @param {Fragment} fragment - The workflow fragment to iterate over. Generated by `usher.fragment()`
+ * @param {Function} doneFn - Indicates when the accumulator is complete by returning a truthy value.
+ * @param {Object} [options] - Custom options for this activity.
+ * @returns {Fragment} This workflow so you can chain commands.
+ */
+Fragment.prototype.accumulator = function accumulator(name, deps, fragment, doneFn, options) {
+  if (!options &amp;&amp; !_.isArray(deps)) {
+    options = doneFn;
+    doneFn = fragment;
+    fragment = deps;
+    deps = undefined;
+  }
+  deps = deps || [];
+
+  var task = new Accumulator(name, deps, fragment, doneFn, options);
+  this._tasks.push(task); // Add the while loop
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
@@ -237,6 +306,7 @@ Fragment.prototype.decision = function decision(name, deps, decisionFn) {
 
   var task = new Decision(name, deps, decisionFn);
   this._tasks.push(task); // Add the decision
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
@@ -260,6 +330,7 @@ Fragment.prototype.terminate = function terminate(name, deps) {
 
   var task = new Terminate(name, deps);
   this._tasks.push(task); // Add the terminate task
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
@@ -282,6 +353,7 @@ Fragment.prototype.transform = function transform(name, deps, transformFn) {
 
   var task = new Transform(name, deps, transformFn);
   this._tasks.push(task); // Add the transformation
+  this._sequencedTasks = null;
 
   return this; // chainable
 };
@@ -292,65 +364,79 @@ Fragment.prototype.transform = function transform(name, deps, transformFn) {
  * @param {Object} input - The results of all dependencies for this transformation
  * @return {*} The transformed input
  */
-</pre>
+
+
+/**
+ * Add a result transformation to the workflow. This sets the fragments results based on the `transformFn`
+ * @param {string} name - The unique name of the result task.
+ * @param {Array} [deps] - The names of the dependencies that must be met before this decision can execute.
+ * @param {Fragment~transformationLogic} [transformFn] - The funtion that will perform the transformation.
+ * @returns {Fragment} This workflow so you can chain commands.
+ */
+Fragment.prototype.result = function result(name, deps, transformFn) {
+  if (!transformFn &amp;&amp; !_.isArray(deps)) {
+    transformFn = deps;
+    deps = undefined;
+  }
+  deps = deps || [];
+  transformFn = transformFn || function (input) { return input; };
+
+  var task = new Result(name, deps, transformFn);
+  this._tasks.push(task); // Add the transformation
+  this._sequencedTasks = null;
+
+  return this; // chainable
+};
+
+
+/**
+ * Set an variable accessable to all future scheduled activities
+ * @param {string} name - The unique name of the variable.
+ * @param {Array} [deps] - The names of the dependencies that must be met before this variable can be set.
+ * @param {Fragment~variableValueFunction} [valueFn] - The funtion that will calculate the variable name.
+ * @returns {Fragment} This workflow so you can chain commands.
+ */
+Fragment.prototype.variable = function variable(name, deps, valueFn) {
+  if (!valueFn &amp;&amp; !_.isArray(deps)) {
+    valueFn = deps;
+    deps = undefined;
+  }
+  deps = deps || [];
+  valueFn = valueFn || function (input) { return input; };
+
+  var task = new Variable(name, deps, valueFn);
+  this._tasks.push(task); // Add the variable task
+  this._sequencedTasks = null;
+
+  return this; // chainable
+};
+
+/**
+ * A function to determine the value of the variable
+ * @callback Fragment~variableValueFunction
+ * @param {Object} input - The results of all dependencies for this variable
+ * @return {*} The variable value
+ */
+</code></pre>
         </article>
     </section>
 
 
 
 
+</div>
 
-				</div>
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Accumulator.html">Accumulator</a></li><li><a href="ActivityPoller.html">ActivityPoller</a></li><li><a href="ActivityTask.html">ActivityTask</a></li><li><a href="DecisionPoller.html">DecisionPoller</a></li><li><a href="Fragment.html">Fragment</a></li><li><a href="Loop.html">Loop</a></li><li><a href="Usher.html">Usher</a></li><li><a href="WhileLoop.html">WhileLoop</a></li><li><a href="WorkflowVersion.html">WorkflowVersion</a></li></ul>
+</nav>
 
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		Copyright (C) 2014 meltmedia
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Tue Sep 23 2014 14:33:54 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
+<br clear="both">
 
-			
-			<br clear="both">
-		</div>
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Sep 12 2016 14:59:00 GMT-0700 (MST)
+</footer>
 
-	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
-
-
-	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
-
-	<script>
-		$( function () {
-			$( "#toc" ).toc( {
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : 60
-			} );
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-
-		} );
-	</script>
-
-	
-
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>

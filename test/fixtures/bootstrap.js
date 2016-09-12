@@ -61,7 +61,7 @@ function setup() {
 
 function registerDomain(name) {
   var defer = Q.defer();
-  var swf = new AWS.SimpleWorkflow();
+  var swf = new AWS.SWF();
 
   swf.registerDomain({
       name: name,
@@ -81,7 +81,7 @@ function registerDomain(name) {
 
 function registerWorkflow(domain, name, version) {
   var defer = Q.defer();
-  var swf = new AWS.SimpleWorkflow();
+  var swf = new AWS.SWF();
 
   swf.registerWorkflowType({
       domain: domain,
@@ -103,7 +103,7 @@ function registerWorkflow(domain, name, version) {
 
 function registerActivity(domain, name, version, tasklist) {
   var defer = Q.defer();
-  var swf = new AWS.SimpleWorkflow();
+  var swf = new AWS.SWF();
 
   swf.registerActivityType({
       domain: domain,

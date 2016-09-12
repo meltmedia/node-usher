@@ -180,3 +180,7 @@
 ## 0.10.6 (Aug 8, 2016)
 
 + Support for dynamic child workflow execution in a decider
+
+## 0.10.7 (Aug 8, 2016)
+
++ Support for latest AWS lib

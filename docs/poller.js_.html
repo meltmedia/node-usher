@@ -1,79 +1,31 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Usher Source: decider/poller.js</title>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: decider/poller.js</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-	
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
 
 <body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top ">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">Usher</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="ActivityPoller.html">ActivityPoller</a>
-						</li>
-						
-						<li>
-							<a href="ActivityTask.html">ActivityTask</a>
-						</li>
-						
-						<li>
-							<a href="DecisionPoller.html">DecisionPoller</a>
-						</li>
-						
-						<li>
-							<a href="Fragment.html">Fragment</a>
-						</li>
-						
-						<li>
-							<a href="Usher.html">Usher</a>
-						</li>
-						
-						<li>
-							<a href="WorkflowVersion.html">WorkflowVersion</a>
-						</li>
-						
+<div id="main">
 
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
+    <h1 class="page-title">Source: decider/poller.js</h1>
 
-	<div class="row-fluid">
-
-		
-			<div class="span12">
-				
-				<div id="main">
-					
+    
 
 
-		<h1 class="page-title">Source: decider/poller.js</h1>
     
     <section>
         <article>
-            <pre class="sunlight-highlight-javascript linenums">/*!
+            <pre class="prettyprint source linenums"><code>/*!
  * Usher
  * Copyright(c) 2014 meltmedia &lt;mike@meltmedia.com>
  */
@@ -83,6 +35,7 @@
 var winston = require('winston'),
     os = require('os'),
     _ = require('lodash'),
+    async = require('async'),
     swf = require('aws-swf'),
     AWS = require('aws-sdk'),
     backoff = require('backoff'),
@@ -132,6 +85,7 @@ function DecisionPoller(name, domain, options) {
   }
 
   /** @private */
+  this._registrations = [];
   this._workflows = [];
   this._poller = undefined;
 }
@@ -157,6 +111,59 @@ DecisionPoller.prototype.version = function version(ver) {
   }
 
   return workflow;
+};
+
+
+/**
+ * Register a SWF Workflow
+ * @param {string} name - The name of the workflow.
+ * @param {string} version - The AWS version of the workflow being registered.
+ * @returns {DecisionPoller} This Poller so you can chain commands.
+ */
+DecisionPoller.prototype.register = function register(name, version) {
+  this._registrations.push({ name: name, version: version });
+  return this;
+};
+
+
+/**
+ * Execute the proper workflow version
+ * @param {Object} input - Input to the workflow
+ * @param {string} version - Version of the workflow to execute (conforms to v2.0 of http://semver.org)
+ * @param {Object} [tags] - Tags to mark the workflow with
+ * @param {Function} [cb] - Callback when done
+ * @returns {Workflow} This workflow version so you can configure the actual decider.
+ */
+/**
+ * Execute a new run of this workflow
+ * @returns {WorkflowVersion} This workflow so you can chain commands.
+ */
+DecisionPoller.prototype.execute = function execute(input, version, tags, cb) {
+
+  if (!input &amp;&amp; !version) {
+    throw new Error('Missing paramaters for workflow execution: input and version required');
+  }
+
+  cb = cb || (_.isFunction(tags) ? tags : function () {});
+  tags = _.isFunction(tags) ? [] : (tags || []);
+
+  var config = usherUtil.workflowConfig(this.name, version, input, this.options);
+
+  // Merge local tags with global tags
+  config.tagList = _.isArray(config.tagList) ? config.tagList.concat(tags) : tags;
+
+  // The domain is not always needed so it's not set by the workflow config
+  config.domain = this.domain;
+
+  var workflow = new swf.Workflow(config, new AWS.SWF());
+  var workflowExecution = workflow.start({ input: JSON.stringify(input) }, function (err, runId) {
+    if (err) {
+      return cb(err);
+    }
+    cb(null, runId, workflowExecution.workflowId);
+  });
+
+  return this; // chainable
 };
 
 
@@ -198,7 +205,7 @@ DecisionPoller.prototype.start = function start() {
     'reverseOrder': false
   };
 
-  this._poller = new swf.Decider(config, new AWS.SimpleWorkflow());
+  this._poller = new swf.Decider(config, new AWS.SWF());
 
   this._poller.on('decisionTask', this._onDecisionTask.bind(this));
 
@@ -236,8 +243,14 @@ DecisionPoller.prototype.start = function start() {
   }.bind(this));
 
 
-  winston.log('info', 'Starting poller: %s', this.name);
-  this._poller.start();
+  winston.log('debug', 'Registering %s workflows', this._registrations.length);
+  this._registerWorkflows(function () {
+    if (!_.isEmpty(self._poller)) {
+      // Start the poller
+      winston.log('info', 'Starting poller: %s', self.name);
+      self._poller.start();
+    }
+  });
 
   return this; // chainable
 };
@@ -271,10 +284,35 @@ DecisionPoller.prototype.stop = function stop() {
 
 
 /** @private */
+DecisionPoller.prototype._registerWorkflows = function _registerWorkflows(done) {
+  var aws = new AWS.SWF(),
+      self = this;
+
+  async.each(this._registrations, function (item, next) {
+    aws.registerWorkflowType({
+        domain: self.domain,
+        name: item.name,
+        version: item.version || '1.0.0',
+        defaultTaskList: self.options.taskList,
+        defaultExecutionStartToCloseTimeout: self.options.defaultExecutionStartToCloseTimeout,
+        defaultTaskStartToCloseTimeout: self.options.defaultTaskStartToCloseTimeout,
+        defaultTaskPriority: self.options.defaultTaskPriority,
+        defaultChildPolicy: self.options.defaultChildPolicy
+      },
+      function () {
+        next();
+      }
+    );
+  }, done);
+};
+
+
 DecisionPoller.prototype._onDecisionTask = function _onDecisionTask(task) {
 
   // If we are handling request, we can successfuly reset our backoff strategy
-  this._pollerBackoff.reset();
+  if (this._pollerBackoff) {
+    this._pollerBackoff.reset();
+  }
 
   var name = task.config.workflowType.name,
       version = usherUtil.semverPad(task.config.workflowType.version);
@@ -305,65 +343,26 @@ DecisionPoller.prototype._onDecisionTask = function _onDecisionTask(task) {
   workflow._handleTask(task);
 
 };
-</pre>
+</code></pre>
         </article>
     </section>
 
 
 
 
+</div>
 
-				</div>
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Accumulator.html">Accumulator</a></li><li><a href="ActivityPoller.html">ActivityPoller</a></li><li><a href="ActivityTask.html">ActivityTask</a></li><li><a href="DecisionPoller.html">DecisionPoller</a></li><li><a href="Fragment.html">Fragment</a></li><li><a href="Loop.html">Loop</a></li><li><a href="Usher.html">Usher</a></li><li><a href="WhileLoop.html">WhileLoop</a></li><li><a href="WorkflowVersion.html">WorkflowVersion</a></li></ul>
+</nav>
 
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		Copyright (C) 2014 meltmedia
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Tue Sep 23 2014 14:33:54 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
+<br clear="both">
 
-			
-			<br clear="both">
-		</div>
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Sep 12 2016 14:59:00 GMT-0700 (MST)
+</footer>
 
-	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
-
-
-	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
-
-	<script>
-		$( function () {
-			$( "#toc" ).toc( {
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : 60
-			} );
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-
-		} );
-	</script>
-
-	
-
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>

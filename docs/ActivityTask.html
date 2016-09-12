@@ -1,75 +1,28 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Usher Class: ActivityTask</title>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: ActivityTask</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-	
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
 
 <body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top ">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">Usher</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
 
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="ActivityPoller.html">ActivityPoller</a>
-						</li>
-						
-						<li>
-							<a href="ActivityTask.html">ActivityTask</a>
-						</li>
-						
-						<li>
-							<a href="DecisionPoller.html">DecisionPoller</a>
-						</li>
-						
-						<li>
-							<a href="Fragment.html">Fragment</a>
-						</li>
-						
-						<li>
-							<a href="Usher.html">Usher</a>
-						</li>
-						
-						<li>
-							<a href="WorkflowVersion.html">WorkflowVersion</a>
-						</li>
-						
+<div id="main">
 
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
+    <h1 class="page-title">Class: ActivityTask</h1>
 
-	<div class="row-fluid">
-
-		
-		<div class="span8">
-			
-				<div id="main">
-					
+    
 
 
-	<h1 class="page-title">Class: ActivityTask</h1>
+
 <section>
 
 <header>
@@ -87,11 +40,11 @@
         
 <dt>
     <h4 class="name" id="ActivityTask"><span class="type-signature"></span>new ActivityTask<span class="signature">(task)</span><span class="type-signature"></span></h4>
-    
+
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         The context for the execution of the activity
@@ -99,32 +52,32 @@
     
 
     
+
     
-    
-    
+
     
         <h5>Parameters:</h5>
         
 
-<table class="params table table-striped">
+<table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -147,12 +100,11 @@
             <td class="description last">The raw `aws-swf` activity task</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
+    
 
-    
-    
     
 <dl class="details">
     
@@ -176,7 +128,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-19">line 19</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -187,17 +139,19 @@
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
@@ -223,11 +177,11 @@
             
 <dt>
     <h4 class="name" id="failed"><span class="type-signature"></span>failed<span class="signature">(name, <span class="optional">err</span>, <span class="optional">retriable</span>, <span class="optional">cb</span>)</span><span class="type-signature"></span></h4>
-    
+
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Execute if the activity failed
@@ -235,34 +189,34 @@
     
 
     
+
     
-    
-    
+
     
         <h5>Parameters:</h5>
         
 
-<table class="params table table-striped">
+<table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -293,7 +247,7 @@
             <td class="description last">A unique name for the failure</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -326,7 +280,7 @@
             <td class="description last">The reason for the failure</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -359,7 +313,7 @@
             <td class="description last">A hint to if the activity should be attempted again</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -392,12 +346,11 @@
             <td class="description last">Callback to run once we have successfuly informed SWF of our status</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
+    
 
-    
-    
     
 <dl class="details">
     
@@ -421,7 +374,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-77">line 77</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -432,17 +385,19 @@
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
@@ -450,11 +405,11 @@
             
 <dt>
     <h4 class="name" id="success"><span class="type-signature"></span>success<span class="signature">(output, <span class="optional">cb</span>)</span><span class="type-signature"></span></h4>
-    
+
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Execute once the activity has completed successfuly
@@ -462,34 +417,34 @@
     
 
     
+
     
-    
-    
+
     
         <h5>Parameters:</h5>
         
 
-<table class="params table table-striped">
+<table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -520,7 +475,7 @@
             <td class="description last">The results of the activity, if any</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -553,12 +508,11 @@
             <td class="description last">Callback to run once we have successfuly informed SWF of our status</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
+    
 
-    
-    
     
 <dl class="details">
     
@@ -582,7 +536,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#sunlight-1-line-52">line 52</a>
+        <a href="task.js.html">activity/task.js</a>, <a href="task.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -593,17 +547,19 @@
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
@@ -620,61 +576,19 @@
 
 
 
-				</div>
+</div>
 
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		Copyright (C) 2014 meltmedia
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on Tue Sep 23 2014 14:33:54 GMT-0700 (MST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Accumulator.html">Accumulator</a></li><li><a href="ActivityPoller.html">ActivityPoller</a></li><li><a href="ActivityTask.html">ActivityTask</a></li><li><a href="DecisionPoller.html">DecisionPoller</a></li><li><a href="Fragment.html">Fragment</a></li><li><a href="Loop.html">Loop</a></li><li><a href="Usher.html">Usher</a></li><li><a href="WhileLoop.html">WhileLoop</a></li><li><a href="WorkflowVersion.html">WorkflowVersion</a></li></ul>
+</nav>
 
-			
-			<div class="span3">
-				<div id="toc"></div>
-			</div>
-			
-			<br clear="both">
-		</div>
+<br clear="both">
 
-	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Mon Sep 12 2016 14:59:00 GMT-0700 (MST)
+</footer>
 
-
-	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
-
-	<script>
-		$( function () {
-			$( "#toc" ).toc( {
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : 60
-			} );
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-
-		} );
-	</script>
-
-	
-
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>
